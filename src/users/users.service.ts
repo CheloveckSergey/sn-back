@@ -6,19 +6,22 @@ import { RolesService } from 'src/roles/roles.service';
 import * as uuid from 'uuid';
 import { writeFile } from "fs/promises";
 import * as path from "path";
+import { AuthorService } from 'src/author/author.service';
 
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectModel(User) private userRepository: typeof User,
-    private rolesService: RolesService
+    private rolesService: RolesService,
+    private authorService: AuthorService,
   ) {}
 
   async createUser(dto: CreateUserDto) {
     const user = await this.userRepository.create(dto);
-    const role = await this.rolesService.getRoleByValue(2);
+    const role = await this.rolesService.getRoleByValue(3);
     user.$set('roles', [role.id]);
+    const author = this.authorService.createAuthor({name: user.login, authorType: 'user', authorId: user.id});
     return user;
   }
 
@@ -56,6 +59,8 @@ export class UsersService {
         }
       }
     );
+    const author = await this.authorService.getAuthorByUserId(id);
+    await this.authorService.updateAvatar(avatarName, author.id);
     return {message: 'Ну вроде нормал'};
   }
 }

@@ -6,7 +6,7 @@ interface GroupDescCreationAttrs {
 }
 
 @Table({
-  tableName: "groupDescs",
+  tableName: "group_descs",
 })
 export class GroupDesc extends Model<GroupDesc, GroupDescCreationAttrs> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})

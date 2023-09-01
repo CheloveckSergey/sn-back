@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { PostUserLike } from './likes.model';
+import { PostLike } from './likes.model';
 import { PULikeReqDto } from './dto';
 
 @Injectable()
 export class PULikeService {
 
   constructor(
-    @InjectModel(PostUserLike) private puLikeReposiroty: typeof PostUserLike,
+    @InjectModel(PostLike) private puLikeReposiroty: typeof PostLike,
   ) {}
 
   private async getAllPULikes() {
@@ -15,10 +15,10 @@ export class PULikeService {
     return allPULikes;
   }
 
-  async getAllPULikesByPostId(postUserId: number) {
+  async getAllPULikesByPostId(postId: number) {
     const puLikes = await this.puLikeReposiroty.findAll({
       where: {
-        postUserId,
+        postId,
       }
     });
     return puLikes;
@@ -35,22 +35,22 @@ export class PULikeService {
 
   async createPULike(dto: PULikeReqDto) {
     const allPULikes = await this.getAllPULikes();
-    if (allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postUserId === dto.postUserId)) {
+    if (allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
       throw new HttpException('Такой лайк уже существует', HttpStatus.BAD_REQUEST);
     }
-    const puLike = await this.puLikeReposiroty.create(dto);
+    const puLike = await this.puLikeReposiroty.create({postId: dto.postUserId, userId: dto.userId});
     return puLike
   }
 
   async deletePULike(dto: PULikeReqDto) {
     const allPULikes = await this.getAllPULikes();
-    if (!allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postUserId === dto.postUserId)) {
+    if (!allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
       throw new HttpException('Такого лайка не существует', HttpStatus.BAD_REQUEST);
     }
     const puLike = await this.puLikeReposiroty.destroy({
       where: {
         userId: dto.userId,
-        postUserId: dto.postUserId,
+        postId: dto.postUserId,
       }
     });
     return puLike;

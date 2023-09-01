@@ -21,7 +21,7 @@ export class PULikesController {
     return this.puLikeService.getAllPULikesByUserId(id);
   }
 
-  @Post('createPostLike')
+  @Post('/createPostLike')
   async createPostLike(
     @Body() dto: PULikeReqDto
   ) {

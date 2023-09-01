@@ -6,7 +6,7 @@ export interface RTCreationAttrs {
   token: string,
 }
 
-@Table({tableName: 'refreshTokens'})
+@Table({tableName: 'refresh_tokens'})
 export class RefreshToken extends Model<RefreshToken, RTCreationAttrs> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;

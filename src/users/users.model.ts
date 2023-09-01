@@ -2,10 +2,11 @@ import { BelongsToMany, Column, DataType, HasMany, HasOne, Model, Table } from "
 import { RefreshToken } from "src/auth/refreshTokens.model";
 import { GroupModerator } from "src/group/group-moderator.mode";
 import { Group } from "src/group/group.model";
-import { PostUserLike } from "src/likes/likes.model";
-import { PostUser } from "src/userPOsts/posts.model";
+import { PostLike } from "src/likes/likes.model";
+import { Post } from "src/posts/posts.model";
 import { Roles } from "src/roles/roles.model";
 import { UserRoles } from "src/roles/user-roles.model";
+import { Author } from "src/author/author.model";
 
 interface UserCreationAttrs {
   login: string,
@@ -34,11 +35,8 @@ export class User extends Model<User, UserCreationAttrs> {
   @HasOne(() => RefreshToken)
   refreshToken: RefreshToken;
 
-  @HasMany(() => PostUser)
-  posts: PostUser[];
-
-  @HasMany(() => PostUserLike)
-  postUserLikes: PostUserLike[];
+  @HasMany(() => PostLike)
+  postUserLikes: PostLike[];
 
   @HasMany(() => Group)
   groupAdmin: Group[];
@@ -48,4 +46,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @BelongsToMany(() => Group, () => GroupModerator)
   subGroups: Group[];
+
+  @HasOne(() => Author)
+  author: Author
 }

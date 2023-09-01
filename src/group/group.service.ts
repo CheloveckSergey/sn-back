@@ -6,6 +6,7 @@ import { GroupDesc } from './group-desc.model';
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
+import { AuthorService } from 'src/author/author.service';
 
 @Injectable()
 export class GroupService {
@@ -13,7 +14,8 @@ export class GroupService {
   constructor(
     @InjectModel(Group) private groupRepository: typeof Group,
     @InjectModel(GroupDesc) private groupDescRepository: typeof GroupDesc,
-    private userService: UsersService
+    private userService: UsersService,
+    private authorService: AuthorService,
   ) {}
 
   async getAllGroups() {
@@ -79,7 +81,9 @@ export class GroupService {
     }
     const group = await this.groupRepository.create({adminId: userId, name, avatar: imageName});
     const description = await this.groupDescRepository.create({groupId: group.id});
-    // return group.$set('description', [description.id]);
+    const author = await this.authorService.createAuthor({name: group.name, authorType: 'group', authorId: group.id});
+    await this.authorService.updateAvatar(imageName, author.id);
+    return group;
   }
 
   async deleteGroupById(id: number, userId: number) {
@@ -127,5 +131,21 @@ export class GroupService {
     const user = await this.userService.getUserById(userId);
     user.$remove('subGroups', [groupId]);
     return {message: 'Ну вроде отписался'};
+  }
+
+  async createAvatar(userId: number, name: string, file: Express.Multer.File) {
+    const avatarName = uuid.v4() + '.jpg';
+    await writeFile(path.resolve('src', 'static', avatarName), file.buffer);
+    await this.groupRepository.update(
+      {avatar: avatarName},
+      {
+        where: {
+          name
+        }
+      }
+    );
+    const group = await this.getGroupByName(name);
+    await this.authorService.updateAvatar(avatarName, group.author.id);
+    return {message: 'Ну вроде нормал'};
   }
 }

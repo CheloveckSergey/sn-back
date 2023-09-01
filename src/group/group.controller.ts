@@ -77,4 +77,17 @@ export class GroupController {
   ) {
     return this.groupService.subscribe(req.user.id, id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/createAvatar')
+  // @UseInterceptors(FileInterceptor('img', { dest: './uploads' }))
+  @UseInterceptors(FileInterceptor('img'))
+  async createAvatar(
+    @Body() { groupName } : { groupName: string },
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req,
+  ) {
+    const newFile = await this.groupService.createAvatar(req.userPayload.id, groupName, file);
+    return newFile;
+  }
 }

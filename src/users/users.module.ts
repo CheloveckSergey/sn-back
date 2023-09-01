@@ -6,6 +6,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { RolesModule } from 'src/roles/roles.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { FileService } from './file.service';
+import { AuthorModule } from 'src/author/author.module';
 
 @Module({
   controllers: [UsersController],
@@ -14,6 +15,7 @@ import { FileService } from './file.service';
     SequelizeModule.forFeature([User]),
     RolesModule,
     forwardRef(() => AuthModule),
+    AuthorModule,
   ],
   exports: [
     UsersService,

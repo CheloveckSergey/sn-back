@@ -7,6 +7,7 @@ import { GroupSubscriber } from './group-subscriber.model';
 import { GroupDesc } from './group-desc.model';
 import { UsersModule } from 'src/users/users.module';
 import { GroupModerator } from './group-moderator.mode';
+import { AuthorModule } from 'src/author/author.module';
 
 @Module({
   controllers: [GroupController],
@@ -14,6 +15,10 @@ import { GroupModerator } from './group-moderator.mode';
   imports: [
     SequelizeModule.forFeature([Group, GroupSubscriber, GroupDesc, GroupModerator]),
     UsersModule,
+    AuthorModule,
+  ],
+  exports: [
+    GroupService,
   ]
 })
 export class GroupModule {}

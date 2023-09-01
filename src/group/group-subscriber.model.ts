@@ -3,7 +3,7 @@ import { Group } from "./group.model";
 import { User } from "src/users/users.model";
 
 @Table({
-  tableName: "group-subscriber",
+  tableName: "group_subscriber",
 })
 export class GroupSubscriber extends Model<GroupSubscriber> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})

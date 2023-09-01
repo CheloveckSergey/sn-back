@@ -1,16 +1,16 @@
-import { BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
-import { PostUser } from "src/userPosts/posts.model";
+import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { Post } from "src/posts/posts.model";
 import { User } from "src/users/users.model";
 
-interface PULikesCrAttrs {
+interface LikeCreationAttrs {
   userId: number,
-  postUserId: number,
+  postId: number,
 }
 
 @Table({
-  tableName: "post_user_likes",
+  tableName: "post_likes",
 })
-export class PostUserLike extends Model<PostUserLike, PULikesCrAttrs> {
+export class PostLike extends Model<PostLike, LikeCreationAttrs> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 
@@ -18,7 +18,7 @@ export class PostUserLike extends Model<PostUserLike, PULikesCrAttrs> {
   @Column({type: DataType.INTEGER})
   userId: number;
 
-  @ForeignKey(() => PostUser)
+  @ForeignKey(() => Post)
   @Column({type: DataType.INTEGER})
-  postUserId: number;
+  postId: number;
 }

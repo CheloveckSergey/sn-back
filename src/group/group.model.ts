@@ -3,6 +3,7 @@ import { User } from "src/users/users.model";
 import { GroupModerator } from "./group-moderator.mode";
 import { GroupSubscriber } from "./group-subscriber.model";
 import { GroupDesc } from "./group-desc.model";
+import { Author } from "src/author/author.model";
 
 
 interface GroupCreationAttrs {
@@ -36,4 +37,7 @@ export class Group extends Model<Group, GroupCreationAttrs> {
 
   @HasOne(() => GroupDesc)
   description: GroupDesc;
+
+  @HasOne(() => Author)
+  author: Author;
 }

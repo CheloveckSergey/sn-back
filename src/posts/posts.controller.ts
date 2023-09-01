@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostsUserService } from './posts.service';
-import { CreatePostUserDto } from './dto/create-post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('postUser')
+@Controller('post')
 export class PostUserController {
 
   constructor(private postUserService: PostsUserService) {}
@@ -15,11 +14,26 @@ export class PostUserController {
   createPostUser(@Body() { description }: { description: string },
   @Req() req,
   @UploadedFile() file: Express.Multer.File) {
-    return this.postUserService.createPost(description, file, req.userPayload.id)
+    return this.postUserService.createPostByUser(description, file, req.userPayload.id)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/createGroupPost')
+  @UseInterceptors(FileInterceptor('img'))
+  createPostGroup(@Body() body: { description: string, groupName: string },
+  @Req() req,
+  @UploadedFile() file: Express.Multer.File) {
+    console.log(body);
+    return this.postUserService.createPostByGroup(body.description, file, body.groupName, req.userPayload.id)
   }
 
   @Get('/getAllPostByUserId/:id')
   getAllPostByUserId(@Param('id') id: number) {
     return this.postUserService.getAllPostByUserId(id);
+  }
+
+  @Get('/getAllPostByGroupName/:name')
+  getAllPostByGroupName(@Param('name') groupName: string) {
+    return this.postUserService.getAllPostsByGroupName(groupName);
   }
 }

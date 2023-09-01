@@ -1,4 +1,4 @@
-import { PostUserLike } from "src/likes/likes.model"
+import { PostLike } from "src/likes/likes.model"
 
 export interface CreatePostUserDto {
   description: string | undefined,
@@ -14,5 +14,5 @@ export type PostResDto = {
   id: number,
   description: string | undefined,
   image: string | undefined,
-  likes: PostUserLike[],
+  likes: PostLike[],
 }

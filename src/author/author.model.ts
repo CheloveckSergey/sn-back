@@ -1,11 +1,16 @@
-import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Group } from "src/group/group.model";
+import { Post } from "src/posts/posts.model";
 import { User } from "src/users/users.model";
 
 type AuthorType = 'user' | 'group';
 
 interface AuthorCreationAttrs {
-
+  name: string,
+  avatar?: string | undefined,
+  authorType: string,
+  userId?: number,
+  groupId?: number,
 }
 
 @Table({
@@ -32,16 +37,6 @@ export class Author extends Model<Author, AuthorCreationAttrs> {
   @Column({type: DataType.INTEGER, allowNull: true})
   groupId: number;
 
-  // @ForeignKey(() => User)
-  // @Column({type: DataType.INTEGER, allowNull: false})
-  // adminId: number;
-
-  // @BelongsToMany(() => User, () => GroupModerator)
-  // moderators: User[];
-
-  // @BelongsToMany(() => User, () => GroupSubscriber)
-  // subscribers: User[];
-
-  // @HasOne(() => GroupDesc)
-  // description: GroupDesc;
+  @HasMany(() => Post)
+  posts: Post[];
 }

@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { PULikesController } from './likes.controller';
 import { PULikeService } from './likes.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { PostUserLike } from './likes.model';
+import { PostLike } from './likes.model';
 
 @Module({
   controllers: [PULikesController],
   providers: [PULikeService],
   imports: [
-    SequelizeModule.forFeature([PostUserLike]),
+    SequelizeModule.forFeature([PostLike]),
   ],
   exports: [
     PULikeService,
