@@ -2,6 +2,7 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "
 import { Group } from "src/group/group.model";
 import { Post } from "src/posts/posts.model";
 import { User } from "src/users/users.model";
+import { Image } from "src/images/images.model";
 
 type AuthorType = 'user' | 'group';
 
@@ -39,4 +40,7 @@ export class Author extends Model<Author, AuthorCreationAttrs> {
 
   @HasMany(() => Post)
   posts: Post[];
+
+  @HasMany(() => Image)
+  images: Image[];
 }

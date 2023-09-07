@@ -20,7 +20,7 @@ export class AuthorController {
     return this.authorService.getAuthorByNameWithAll(name);
   }
 
-  @Get('/getAuthorByName/:id')
+  @Get('/getAuthorById/:id')
   async getAuthorById(
     @Param('id') id: number
   ) {

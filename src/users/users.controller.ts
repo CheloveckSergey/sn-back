@@ -46,4 +46,11 @@ export class UsersController {
     const newFile = await this.userService.createAvatar(req.userPayload.id, file);
     return newFile;
   }
+
+  @Get('/getAuthorByUserId/:id')
+  async getAuthorByUserId(
+    @Param('id') userId: number
+  ) {
+    return this.userService.getAuthorByUserId(userId);
+  }
 }

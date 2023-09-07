@@ -21,6 +21,9 @@ import { GroupModerator } from "./group/group-moderator.mode";
 import { AuthorModule } from './author/author.module';
 import { Author } from "./author/author.model";
 import { ImagesModule } from './images/images.module';
+import { Image } from "./images/images.model";
+import { ImagesLikesModule } from './images-likes/images-likes.module';
+import { ImageLike } from "./images-likes/images-likes.model";
 
 
 @Module({
@@ -32,7 +35,7 @@ import { ImagesModule } from './images/images.module';
       username: 'root',
       password: 'David_2102',
       database: 'sn',
-      models: [User, Roles, UserRoles, RefreshToken, Post, UserDesc, PostLike, Group, GroupSubscriber, GroupDesc, GroupModerator, Author],
+      models: [User, Roles, UserRoles, RefreshToken, Post, UserDesc, PostLike, Group, GroupSubscriber, GroupDesc, GroupModerator, Author, Image, ImageLike],
       autoLoadModels: true,
     }),
     UsersModule,
@@ -45,6 +48,7 @@ import { ImagesModule } from './images/images.module';
     GroupModule,
     AuthorModule,
     ImagesModule,
+    ImagesLikesModule,
   ]
 })
 export class AppModule {}

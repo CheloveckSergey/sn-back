@@ -148,4 +148,10 @@ export class GroupService {
     await this.authorService.updateAvatar(avatarName, group.author.id);
     return {message: 'Ну вроде нормал'};
   }
+
+  async getAuthorByGroupId(groupId: number) {
+    const group = await this.getGroupById(groupId);
+    const author = group.author;
+    return author;
+  }
 }

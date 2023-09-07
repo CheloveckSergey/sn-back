@@ -31,7 +31,12 @@ export class UsersService {
   }
 
   async getUserById(id: number) {
-    const user = await this.userRepository.findOne({where: {id}});
+    const user = await this.userRepository.findOne({
+      where: {id},
+      include: {
+        all: true,
+      }
+    });
     return user;
   }
 
@@ -62,5 +67,11 @@ export class UsersService {
     const author = await this.authorService.getAuthorByUserId(id);
     await this.authorService.updateAvatar(avatarName, author.id);
     return {message: 'Ну вроде нормал'};
+  }
+
+  async getAuthorByUserId(userId: number) {
+    const user = await this.getUserById(userId);
+    const author = user.author;
+    return author;
   }
 }
