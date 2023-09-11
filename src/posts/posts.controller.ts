@@ -20,12 +20,22 @@ export class PostUserController {
   @UseGuards(JwtAuthGuard)
   @Post('/createGroupPost')
   @UseInterceptors(FileInterceptor('img'))
-  createPostGroup(@Body() body: { description: string, groupName: string },
+  createPostGroup(@Body() body,
   @Req() req,
   @UploadedFile() file: Express.Multer.File) {
+    console.log('postController');
     console.log(body);
-    return this.postUserService.createPostByGroup(body.description, file, body.groupName, req.userPayload.id)
+    return 'lololo';
   }
+  // @UseGuards(JwtAuthGuard)
+  // @Post('/createGroupPost')
+  // @UseInterceptors(FileInterceptor('img'))
+  // createPostGroup(@Body() body: { description: string, groupName: string },
+  // @Req() req,
+  // @UploadedFile() file: Express.Multer.File) {
+  //   console.log(body);
+  //   return this.postUserService.createPostByGroup(body.description, file, body.groupName, req.userPayload.id)
+  // }
 
   @Get('/getAllPostByUserId/:id')
   getAllPostByUserId(@Param('id') id: number) {

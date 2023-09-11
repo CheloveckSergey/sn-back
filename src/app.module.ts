@@ -24,6 +24,8 @@ import { ImagesModule } from './images/images.module';
 import { Image } from "./images/images.model";
 import { ImagesLikesModule } from './images-likes/images-likes.module';
 import { ImageLike } from "./images-likes/images-likes.model";
+import { CommentsModule } from './comments/comments.module';
+import { Comment } from "./comments/comments.model";
 
 
 @Module({
@@ -35,7 +37,22 @@ import { ImageLike } from "./images-likes/images-likes.model";
       username: 'root',
       password: 'David_2102',
       database: 'sn',
-      models: [User, Roles, UserRoles, RefreshToken, Post, UserDesc, PostLike, Group, GroupSubscriber, GroupDesc, GroupModerator, Author, Image, ImageLike],
+      models: [User, 
+        Roles, 
+        UserRoles, 
+        RefreshToken, 
+        Post, 
+        UserDesc, 
+        PostLike, 
+        Group, 
+        GroupSubscriber, 
+        GroupDesc, 
+        GroupModerator, 
+        Author, 
+        Image, 
+        ImageLike,
+        Comment,
+      ],
       autoLoadModels: true,
     }),
     UsersModule,
@@ -49,6 +66,7 @@ import { ImageLike } from "./images-likes/images-likes.model";
     AuthorModule,
     ImagesModule,
     ImagesLikesModule,
+    CommentsModule,
   ]
 })
 export class AppModule {}

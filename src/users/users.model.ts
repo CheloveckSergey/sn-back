@@ -7,6 +7,7 @@ import { Post } from "src/posts/posts.model";
 import { Roles } from "src/roles/roles.model";
 import { UserRoles } from "src/roles/user-roles.model";
 import { Author } from "src/author/author.model";
+import { Comment } from "src/comments/comments.model";
 
 interface UserCreationAttrs {
   login: string,
@@ -48,5 +49,8 @@ export class User extends Model<User, UserCreationAttrs> {
   subGroups: Group[];
 
   @HasOne(() => Author)
-  author: Author
+  author: Author;
+
+  @HasMany(() => Comment)
+  comments: Comment[];
 }
