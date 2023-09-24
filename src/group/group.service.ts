@@ -6,7 +6,15 @@ import { GroupDesc } from './group-desc.model';
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
-import { AuthorService } from 'src/author/author.service';
+import { AuthorService, _Author } from 'src/author/author.service';
+
+type _Group = {
+  id: number,
+  name: string,
+  avatar: string | undefined,
+  adminId: number,
+  author: _Author,
+}
 
 @Injectable()
 export class GroupService {
@@ -14,7 +22,6 @@ export class GroupService {
   constructor(
     @InjectModel(Group) private groupRepository: typeof Group,
     @InjectModel(GroupDesc) private groupDescRepository: typeof GroupDesc,
-    private userService: UsersService,
     private authorService: AuthorService,
   ) {}
 
@@ -39,16 +46,21 @@ export class GroupService {
     return group;
   }
 
-  async getGroupByName(name: string) {
+  async getGroupByName(name: string, curUserId?: number) {
     const group = await this.groupRepository.findOne({
       where: {
         name
       },
-      include: {
-        all: true
-      }
     });
-    return group;
+    const author = await this.authorService.getAuthorByGroupId(group.id, curUserId);
+    let _group: _Group = {
+      id: group.id,
+      name: group.name,
+      avatar: group.avatar,
+      adminId: group.adminId,
+      author: author,
+    };
+    return _group;
   }
 
   async getAdminGroupsByUserId(userId: number) {
@@ -111,27 +123,6 @@ export class GroupService {
   //   return group.subscribers;
   // }
 
-  // async subscribe(userId: number, groupId: number) {
-  //   const subscribers = await this.getAllSubsByGroupId(groupId);
-  //   const candidate = subscribers.find(subscriber => subscriber.id === userId);
-  //   if (candidate) {
-  //     throw new HttpException('Подписка уже оформлена', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const user = await this.userService.getUserById(userId);
-  //   user.$set('subGroups', [groupId]);
-  //   return {message: 'Ну вроде подписался'};
-  // }
-
-  // async unsubscribe(userId: number, groupId: number) {
-  //   const subscribers = await this.getAllSubsByGroupId(groupId);
-  //   const candidate = subscribers.find(subscriber => subscriber.id === userId);
-  //   if (!candidate) {
-  //     throw new HttpException('Данный юзер не подписан на данную группу', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const user = await this.userService.getUserById(userId);
-  //   user.$remove('subGroups', [groupId]);
-  //   return {message: 'Ну вроде отписался'};
-  // }
 
   async createAvatar(userId: number, name: string, file: Express.Multer.File) {
     const avatarName = uuid.v4() + '.jpg';

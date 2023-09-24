@@ -1,8 +1,9 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Group } from "src/group/group.model";
 import { Post } from "src/posts/posts.model";
 import { User } from "src/users/users.model";
 import { Image } from "src/images/images.model";
+import { Author_Subs } from "./author-subs.model";
 
 type AuthorType = 'user' | 'group';
 
@@ -43,4 +44,7 @@ export class Author extends Model<Author, AuthorCreationAttrs> {
 
   @HasMany(() => Image)
   images: Image[];
+
+  @BelongsToMany(() => User, () => Author_Subs)
+  subscribers: User[];
 }

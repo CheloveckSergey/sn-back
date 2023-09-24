@@ -26,6 +26,7 @@ import { ImagesLikesModule } from './images-likes/images-likes.module';
 import { ImageLike } from "./images-likes/images-likes.model";
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from "./comments/comments.model";
+import { Author_Subs } from "./author/author-subs.model";
 
 
 @Module({
@@ -52,6 +53,7 @@ import { Comment } from "./comments/comments.model";
         Image, 
         ImageLike,
         Comment,
+        Author_Subs,
       ],
       autoLoadModels: true,
     }),

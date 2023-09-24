@@ -14,11 +14,13 @@ export class GroupController {
     return this.groupService.getAllGroups();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getGroupByName/:name')
   async getGroupByName(
-    @Param('name') name: string
+    @Param('name') name: string,
+    @Req() req
   ) {
-    return this.groupService.getGroupByName(name);
+    return this.groupService.getGroupByName(name, req.userPayload.id);
   }
 
   @Get('/getGroupById/:id')

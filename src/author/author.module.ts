@@ -4,12 +4,13 @@ import { AuthorService } from './author.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Author } from './author.model';
 import { GroupModule } from 'src/group/group.module';
+import { Author_Subs } from './author-subs.model';
 
 @Module({
   controllers: [AuthorController],
   providers: [AuthorService],
   imports: [
-    SequelizeModule.forFeature([Author]),
+    SequelizeModule.forFeature([Author, Author_Subs]),
   ],
   exports: [
     AuthorService,

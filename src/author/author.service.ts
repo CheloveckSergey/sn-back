@@ -1,6 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Author } from './author.model';
+import { User } from 'src/users/users.model';
+
+export type _Author = {
+  id: number,
+  name: string,
+  avatar: string | undefined,
+  authorType: string,
+  subscribedFor: boolean,
+}
+
+export type _Sub = {
+  id: number,
+  login: string,
+  avatar: string | undefined,
+}
 
 @Injectable()
 export class AuthorService {
@@ -45,7 +60,7 @@ export class AuthorService {
     return author;
   }
 
-  async getAuthorByUserId(id: number) {
+  async getAuthorByUserId(id: number, curUserId?: number) {
     const author = await this.authorRep.findOne({
       where: {
         userId: id,
@@ -54,13 +69,26 @@ export class AuthorService {
     return author;
   }
 
-  async getAuthorByGroupId(id: number) {
+  async getAuthorByGroupId(id: number, curUserId?: number): Promise<_Author> {
     const author = await this.authorRep.findOne({
       where: {
         groupId: id,
       }
     });
-    return author;
+    const subscribers = await this.getSubscribersByAuthorId(author.id);
+    // console.log(subscribers);
+    console.log(curUserId);
+    let _author: _Author = {
+      id: author.id,
+      name: author.name,
+      avatar: author.avatar,
+      authorType: author.authorType,
+      subscribedFor: false,
+    };
+    if (subscribers.find(sub => sub.id === curUserId)) {
+      _author.subscribedFor = true;
+    }
+    return _author;
   }
 
   async deleteAuthorById(id: number) {
@@ -81,17 +109,45 @@ export class AuthorService {
     return response;
   }
 
-  // async getAllPostsByUserId(id: number) {
-  //   const author = await this.authorRep.findOne({
-  //     where: {
-  //       userId: id
-  //     },
-  //     include: {
-  //       all: true,
-  //     }
-  //   });
-  //   return author.posts[0];
-  // }
+  async getSubscribersByAuthorId(authorId: number) {
+    const author = await this.authorRep.findOne({
+      where: {
+        id: authorId,
+      },
+      include: [{model: User}],
+    });
+    const subscribers = author.subscribers.map(sub => {
+      let _sub: any = {};
+      Object.keys(sub.dataValues).forEach(key => {
+        _sub[key] = sub[key];
+      });
+      return _sub;
+    });
+    // console.log(subscribers);
+    return subscribers;
+  }
+
+  async subscribe(userId: number, authorId: number) {
+    const subscribers = await this.getSubscribersByAuthorId(authorId);
+    const candidate = subscribers.find(subscriber => subscriber.id === userId);
+    if (candidate) {
+      throw new HttpException('Подписка уже оформлена', HttpStatus.BAD_REQUEST);
+    }
+    const author = await this.getAuthorById(authorId);
+    author.$set('subscribers', [userId]);
+    return {message: 'Ну вроде подписался'};
+  }
+
+  async unsubscribe(userId: number, authorId: number) {
+    const subscribers = await this.getSubscribersByAuthorId(authorId);
+    const candidate = subscribers.find(subscriber => subscriber.id === userId);
+    if (!candidate) {
+      throw new HttpException('Данный юзер не подписан на данную группу', HttpStatus.BAD_REQUEST);
+    }
+    const author = await this.getAuthorById(authorId);
+    author.$remove('subscribers', [userId]);
+    return {message: 'Ну вроде отписался'};
+  }
 
   async updateAvatar(fileName: string, authorId: number) {
     const response = await this.authorRep.update(
