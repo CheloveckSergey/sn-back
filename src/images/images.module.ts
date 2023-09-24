@@ -6,14 +6,14 @@ import { Image } from './images.model';
 import { AuthorModule } from 'src/author/author.module';
 import { UsersModule } from 'src/users/users.module';
 import { GroupModule } from 'src/group/group.module';
+import { AuthorService } from 'src/author/author.service';
 
 @Module({
   controllers: [ImagesController],
   providers: [ImagesService],
   imports: [
     SequelizeModule.forFeature([Image]),
-    UsersModule,
-    GroupModule,
+    AuthorModule,
   ],
 })
 export class ImagesModule {}

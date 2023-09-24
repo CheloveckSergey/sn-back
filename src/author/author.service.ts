@@ -1,11 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Author } from './author.model';
-import { where } from 'sequelize';
-import * as uuid from 'uuid';
-import * as path from 'path';
-import { writeFile } from 'fs/promises';
-import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class AuthorService {
@@ -68,18 +63,6 @@ export class AuthorService {
     return author;
   }
 
-  async getAuthorByNameWithAll(name: string) {
-    const author = await this.authorRep.findOne({
-      where: {
-        name
-      },
-      include: {
-        all: true,
-      }
-    });
-    return author;
-  }
-
   async deleteAuthorById(id: number) {
     const response = await this.authorRep.destroy({
       where: {
@@ -98,17 +81,17 @@ export class AuthorService {
     return response;
   }
 
-  async getAllPostsByUserId(id: number) {
-    const author = await this.authorRep.findOne({
-      where: {
-        userId: id
-      },
-      include: {
-        all: true,
-      }
-    });
-    return author.posts[0];
-  }
+  // async getAllPostsByUserId(id: number) {
+  //   const author = await this.authorRep.findOne({
+  //     where: {
+  //       userId: id
+  //     },
+  //     include: {
+  //       all: true,
+  //     }
+  //   });
+  //   return author.posts[0];
+  // }
 
   async updateAvatar(fileName: string, authorId: number) {
     const response = await this.authorRep.update(

@@ -55,32 +55,31 @@ export class GroupController {
     return this.groupService.deleteGroupById(dto.groupId, req.user.id);
   }
 
-  @Get('/getAllSubsByGroupId/:id')
-  async getAllSubsByGroupId(
-    @Param('id') id: number
-  ) {
-    return this.groupService.getAllSubsByGroupId(id);
-  }
+  // @Get('/getAllSubsByGroupId/:id')
+  // async getAllSubsByGroupId(
+  //   @Param('id') id: number
+  // ) {
+  //   return this.groupService.getAllSubsByGroupId(id);
+  // }
 
-  @Post('/subscribe/:id')
-  async subscribe(
-    @Param('id') id: number,
-    @Req() req
-  ) {
-    return this.groupService.subscribe(req.user.id, id);
-  }
+  // @Post('/subscribe/:id')
+  // async subscribe(
+  //   @Param('id') id: number,
+  //   @Req() req
+  // ) {
+  //   return this.groupService.subscribe(req.user.id, id);
+  // }
 
-  @Post('/unsubscribe/:id')
-  async unsubscribe(
-    @Param('id') id: number,
-    @Req() req
-  ) {
-    return this.groupService.subscribe(req.user.id, id);
-  }
+  // @Post('/unsubscribe/:id')
+  // async unsubscribe(
+  //   @Param('id') id: number,
+  //   @Req() req
+  // ) {
+  //   return this.groupService.subscribe(req.user.id, id);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/createAvatar')
-  // @UseInterceptors(FileInterceptor('img', { dest: './uploads' }))
   @UseInterceptors(FileInterceptor('img'))
   async createAvatar(
     @Body() { groupName } : { groupName: string },

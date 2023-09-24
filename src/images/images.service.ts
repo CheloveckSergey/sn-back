@@ -4,16 +4,14 @@ import { Image } from './images.model';
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
-import { UsersService } from 'src/users/users.service';
-import { GroupService } from 'src/group/group.service';
+import { AuthorService } from 'src/author/author.service';
 
 @Injectable()
 export class ImagesService {
 
   constructor(
     @InjectModel(Image) private imageRepository: typeof Image,
-    private usersService: UsersService,
-    private groupService: GroupService,
+    private authorService: AuthorService,
   ) {}
 
   async createImageByAuthorId(authorId: number, file: Express.Multer.File) {
@@ -29,19 +27,19 @@ export class ImagesService {
   }
 
   async createImageByUserId(userId: number, file: Express.Multer.File) {
-    const author = await this.usersService.getAuthorByUserId(userId);
+    const author = await this.authorService.getAuthorByUserId(userId);
     const response = await this.createImageByAuthorId(author.id, file);
     return response;
   }
 
   async createImageByGroupId(groupId: number, file: Express.Multer.File) {
-    const author = await this.groupService.getAuthorByGroupId(groupId);  
+    const author = await this.authorService.getAuthorByGroupId(groupId);  
     const response = await this.createImageByAuthorId(author.id, file);
     return response;
   }
 
   async getAllImagesByUserId(userId: number) {
-    const author = await this.usersService.getAuthorByUserId(userId);  
+    const author = await this.authorService.getAuthorByUserId(userId);  
     const images = await this.imageRepository.findAll({
       where: {
         authorId: author.id,
@@ -54,7 +52,7 @@ export class ImagesService {
   }
 
   async getAllImagesByGroupId(groupId: number) {
-    const author = await this.groupService.getAuthorByGroupId(groupId);  
+    const author = await this.authorService.getAuthorByGroupId(groupId);  
     const images = await this.imageRepository.findAll({
       where: {
         authorId: author.id,

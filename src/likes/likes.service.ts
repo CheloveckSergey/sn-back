@@ -9,6 +9,15 @@ export class PULikeService {
   constructor(
     @InjectModel(PostLike) private puLikeReposiroty: typeof PostLike,
   ) {}
+  
+  async createPULike(dto: PULikeReqDto) {
+    const allPULikes = await this.getAllPULikes();
+    if (allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
+      throw new HttpException('Такой лайк уже существует', HttpStatus.BAD_REQUEST);
+    }
+    const puLike = await this.puLikeReposiroty.create({postId: dto.postUserId, userId: dto.userId});
+    return puLike
+  }
 
   private async getAllPULikes() {
     const allPULikes = await this.puLikeReposiroty.findAll();
@@ -33,14 +42,6 @@ export class PULikeService {
     return puLikes;
   }
 
-  async createPULike(dto: PULikeReqDto) {
-    const allPULikes = await this.getAllPULikes();
-    if (allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
-      throw new HttpException('Такой лайк уже существует', HttpStatus.BAD_REQUEST);
-    }
-    const puLike = await this.puLikeReposiroty.create({postId: dto.postUserId, userId: dto.userId});
-    return puLike
-  }
 
   async deletePULike(dto: PULikeReqDto) {
     const allPULikes = await this.getAllPULikes();

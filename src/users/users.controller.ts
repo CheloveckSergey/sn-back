@@ -47,10 +47,10 @@ export class UsersController {
     return newFile;
   }
 
-  @Get('/getAuthorByUserId/:id')
-  async getAuthorByUserId(
-    @Param('id') userId: number
-  ) {
-    return this.userService.getAuthorByUserId(userId);
-  }
+  // @Get('/getAuthorByUserId/:id')
+  // async getAuthorByUserId(
+  //   @Param('id') userId: number
+  // ) {
+  //   return this.userService.getAuthorByUserId(userId);
+  // }
 }

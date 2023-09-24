@@ -99,39 +99,39 @@ export class GroupService {
     return response;
   }
 
-  async getAllSubsByGroupId(groupId: number) {
-    const group = await this.groupRepository.findOne({
-      where: {
-        id: groupId,
-      },
-      include: {
-        all: true,
-      }
-    });
-    return group.subscribers;
-  }
+  // async getAllSubsByGroupId(groupId: number) {
+  //   const group = await this.groupRepository.findOne({
+  //     where: {
+  //       id: groupId,
+  //     },
+  //     include: {
+  //       all: true,
+  //     }
+  //   });
+  //   return group.subscribers;
+  // }
 
-  async subscribe(userId: number, groupId: number) {
-    const subscribers = await this.getAllSubsByGroupId(groupId);
-    const candidate = subscribers.find(subscriber => subscriber.id === userId);
-    if (candidate) {
-      throw new HttpException('Подписка уже оформлена', HttpStatus.BAD_REQUEST);
-    }
-    const user = await this.userService.getUserById(userId);
-    user.$set('subGroups', [groupId]);
-    return {message: 'Ну вроде подписался'};
-  }
+  // async subscribe(userId: number, groupId: number) {
+  //   const subscribers = await this.getAllSubsByGroupId(groupId);
+  //   const candidate = subscribers.find(subscriber => subscriber.id === userId);
+  //   if (candidate) {
+  //     throw new HttpException('Подписка уже оформлена', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const user = await this.userService.getUserById(userId);
+  //   user.$set('subGroups', [groupId]);
+  //   return {message: 'Ну вроде подписался'};
+  // }
 
-  async unsubscribe(userId: number, groupId: number) {
-    const subscribers = await this.getAllSubsByGroupId(groupId);
-    const candidate = subscribers.find(subscriber => subscriber.id === userId);
-    if (!candidate) {
-      throw new HttpException('Данный юзер не подписан на данную группу', HttpStatus.BAD_REQUEST);
-    }
-    const user = await this.userService.getUserById(userId);
-    user.$remove('subGroups', [groupId]);
-    return {message: 'Ну вроде отписался'};
-  }
+  // async unsubscribe(userId: number, groupId: number) {
+  //   const subscribers = await this.getAllSubsByGroupId(groupId);
+  //   const candidate = subscribers.find(subscriber => subscriber.id === userId);
+  //   if (!candidate) {
+  //     throw new HttpException('Данный юзер не подписан на данную группу', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const user = await this.userService.getUserById(userId);
+  //   user.$remove('subGroups', [groupId]);
+  //   return {message: 'Ну вроде отписался'};
+  // }
 
   async createAvatar(userId: number, name: string, file: Express.Multer.File) {
     const avatarName = uuid.v4() + '.jpg';
@@ -147,11 +147,5 @@ export class GroupService {
     const group = await this.getGroupByName(name);
     await this.authorService.updateAvatar(avatarName, group.author.id);
     return {message: 'Ну вроде нормал'};
-  }
-
-  async getAuthorByGroupId(groupId: number) {
-    const group = await this.getGroupById(groupId);
-    const author = group.author;
-    return author;
   }
 }

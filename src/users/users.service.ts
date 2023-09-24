@@ -68,10 +68,4 @@ export class UsersService {
     await this.authorService.updateAvatar(avatarName, author.id);
     return {message: 'Ну вроде нормал'};
   }
-
-  async getAuthorByUserId(userId: number) {
-    const user = await this.getUserById(userId);
-    const author = user.author;
-    return author;
-  }
 }
