@@ -9,6 +9,13 @@ import * as path from "path";
 import { AuthorService } from 'src/author/author.service';
 import { User_Friend } from './user-friends.model';
 
+type OneUser = {
+  id: number,
+  login: string,
+  avatar: string,
+  isFriend: boolean,
+}
+
 @Injectable()
 export class UsersService {
 
@@ -32,14 +39,42 @@ export class UsersService {
     return users;
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: number, curUserId?: number) {
     const user = await this.userRepository.findOne({
       where: {id},
-      include: {
-        all: true,
-      }
     });
-    return user;
+    let _user: OneUser;
+    if (!curUserId) {
+      _user = {
+        id: user.id,
+        login: user.login,
+        avatar: user.avatar,
+        isFriend: false,
+      };
+      return _user;
+    }
+    const user_friend = await this.user_FriendRep.findOne({
+      where: {
+        userId1: id,
+        userId2: curUserId,
+      }
+    })
+    if (user_friend) {
+      _user = {
+        id: user.id,
+        login: user.login,
+        avatar: user.avatar,
+        isFriend: true,
+      }
+    } else {
+      _user = {
+        id: user.id,
+        login: user.login,
+        avatar: user.avatar,
+        isFriend: false,
+      }
+    }
+    return _user;
   }
 
   async getUserByLogin(login: string) {
@@ -72,6 +107,7 @@ export class UsersService {
   }
 
   async createFriendship(userId1: number, userId2: number) {
+    console.log(userId1 + ':' + userId2);
     const friends = await this.getFriendsByUserId(userId1);
     if (friends.find(friend => friend.id === userId2)) {
       throw new HttpException("Такие пользователи уже дружат, если ты понимаешь о чём я ;)", HttpStatus.BAD_REQUEST);
@@ -116,7 +152,6 @@ export class UsersService {
         userId1: userId,
       }
     });
-    users_friends.forEach(user_friend => console.log(user_friend.userId2));
     const allUsers = await this.getAllUsers();
     const friends = allUsers.filter((user) => {
       for (let user_friend of users_friends) {
@@ -141,6 +176,7 @@ export class UsersService {
   //хотя в объявлении точно указано number, просто чудеса ебать :)
   async deleteFriend(userId1: number, userId2: number) {
     const friends = await this.getFriendsByUserId(userId1);
+    //Здесь приходится делать нестрогое сравнение из-за выше описанной хуеты
     const thisFriend = friends.find(friend => friend.id == userId2);
     if (!thisFriend) {
       throw new HttpException('А вы и не дружите. Лох.', HttpStatus.BAD_REQUEST);

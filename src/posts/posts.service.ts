@@ -75,4 +75,8 @@ export class PostsUserService {
     const posts = await this.getAllPostByAuthorId(group.author.id);
     return posts;
   }
+
+  // async getFeedByUserId(userId: number) {
+  //   const 
+  // }
 }

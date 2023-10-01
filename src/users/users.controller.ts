@@ -29,6 +29,15 @@ export class UsersController {
     return this.userService.getUserByLogin(login);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/getUserById/:id')
+  getUserById(
+    @Param('id') id: number,
+    @Req() req,
+  ) {
+    return this.userService.getUserById(id, req.userPayload.id);
+  }
+
   @Get('/avatar/:id')
   getAvatar(@Param('id') id: number) {
     return this.userService.getAvatarById(id);
@@ -53,6 +62,7 @@ export class UsersController {
     @Param('userId') userId: number,
     @Req() req,
   ) {
+    console.log(userId);
     return this.userService.createFriendship(req.userPayload.id, userId);
   }
 
