@@ -9,6 +9,7 @@ import { UserRoles } from "src/roles/user-roles.model";
 import { Author } from "src/author/author.model";
 import { Comment } from "src/comments/comments.model";
 import { Author_Subs } from "src/author/author-subs.model";
+import { User_Friend } from "./user-friends.model";
 
 interface UserCreationAttrs {
   login: string,
@@ -57,4 +58,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @BelongsToMany(() => Author, () => Author_Subs)
   subAuthors: Author[];
+
+  // @BelongsToMany(() => User, () => User_Friend)
+  // friends: User[];
 }

@@ -134,7 +134,8 @@ export class AuthorService {
       throw new HttpException('Подписка уже оформлена', HttpStatus.BAD_REQUEST);
     }
     const author = await this.getAuthorById(authorId);
-    author.$set('subscribers', [userId]);
+    // author.$set('subscribers', [userId]);
+    author.$add('subscribers', [userId]);
     return {message: 'Ну вроде подписался'};
   }
 

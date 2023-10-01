@@ -47,10 +47,37 @@ export class UsersController {
     return newFile;
   }
 
-  // @Get('/getAuthorByUserId/:id')
-  // async getAuthorByUserId(
-  //   @Param('id') userId: number
-  // ) {
-  //   return this.userService.getAuthorByUserId(userId);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('/createFriendship/:userId')
+  async createFriendship(
+    @Param('userId') userId: number,
+    @Req() req,
+  ) {
+    return this.userService.createFriendship(req.userPayload.id, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/deleteFriendship/:userId')
+  async deleteFriendship(
+    @Param('userId') userId: number,
+    @Req() req,
+  ) {
+    return this.userService.deleteFriend(req.userPayload.id, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getPossibleFriends')
+  async getPossibleFriends(
+    @Req() req,
+  ) {
+    return this.userService.getPossibleFriends(req.userPayload.id);
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('/getAllFriends')
+  async getAllFriends(
+    @Req() req,
+  ) {
+    return this.userService.getFriendsByUserId(req.userPayload.id);
+  }
 }

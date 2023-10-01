@@ -8,12 +8,13 @@ import { AuthModule } from 'src/auth/auth.module';
 import { FileService } from './file.service';
 import { AuthorModule } from 'src/author/author.module';
 import { Author_Subs } from 'src/author/author-subs.model';
+import { User_Friend } from './user-friends.model';
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService, FileService],
   imports: [
-    SequelizeModule.forFeature([User, Author_Subs]),
+    SequelizeModule.forFeature([User, Author_Subs, User_Friend]),
     RolesModule,
     forwardRef(() => AuthModule),
     AuthorModule,
