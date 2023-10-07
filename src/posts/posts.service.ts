@@ -6,6 +6,9 @@ import * as uuid from 'uuid';
 import * as path from 'path';
 import { AuthorService } from 'src/author/author.service';
 import { GroupService } from 'src/group/group.service';
+import { UsersService } from 'src/users/users.service';
+import { Op } from 'sequelize';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class PostsUserService {
@@ -14,6 +17,7 @@ export class PostsUserService {
     @InjectModel(Post) private postRepository: typeof Post,
     private authorService: AuthorService,
     private groupService: GroupService,
+    private userService: UsersService,
   ) {}
 
   async createPostByUser(description: string, imageFile: Express.Multer.File, userId: number) {
@@ -76,7 +80,30 @@ export class PostsUserService {
     return posts;
   }
 
-  // async getFeedByUserId(userId: number) {
-  //   const 
-  // }
+  async getFeedByUserId(userId: number) {
+    // const friends = await this.userService.getFriendsByUserId(userId);
+    // const friendAuthors = friends.map(async (friend) => await this.authorService.getAuthorByUserId(friend.id));
+    // const groups = await
+
+    const authors = await this.userService.getAllSubAuthorsByUserId(userId);
+    // console.log('AUTHORS');
+    // authors.forEach(author => console.log(author.id));
+    if (authors.length === 0) {
+      return [];
+    }
+    const posts = await this.postRepository.findAll({
+      where: {
+        authorId: {
+          [Op.or]: authors.map(author => author.id),
+        }
+      },
+      include: {
+        all: true,
+      },
+      order: sequelize.col('createdAt'),
+    });
+    // console.log('POSTS');
+    // posts.forEach(post => console.log(post.id));
+    return posts;
+  }
 }

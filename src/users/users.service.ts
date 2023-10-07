@@ -8,6 +8,7 @@ import { writeFile } from "fs/promises";
 import * as path from "path";
 import { AuthorService } from 'src/author/author.service';
 import { User_Friend } from './user-friends.model';
+import { Author } from 'src/author/author.model';
 
 type OneUser = {
   id: number,
@@ -115,7 +116,7 @@ export class UsersService {
     const user1 = await this.getUserById(userId1);
     const user2 = await this.getUserById(userId2);
     
-    // //Это полная хуйня, но я заебался с этими ебаными связями и методами, которые хуй пойми как сука ёбаная блять работают
+    //Это полная хуйня, но я заебался с этими ебаными связями и методами, которые хуй пойми как сука ёбаная блять работают
     try {
       const possUser_Friend1 = await this.user_FriendRep.findOne({
         where: {
@@ -124,16 +125,21 @@ export class UsersService {
         }
       });
       if (!possUser_Friend1) {
-        const user_friend1 = await this.user_FriendRep.create({userId1: user1.id, userId2: user2.id})
+        const user_friend1 = await this.user_FriendRep.create({userId1: user1.id, userId2: user2.id});
+        const author = await this.authorService.getAuthorByUserId(user2.id);
+        await this.authorService.subscribe(user1.id, author.id);
       }
       const possUser_Friend2 = await this.user_FriendRep.findOne({
         where: {
-          userId1: user2.id,
           userId2: user1.id,
+          userId1: user2.id,
         }
       });
       if (!possUser_Friend2) {
-        const user_friend2 = await this.user_FriendRep.create({userId1: user2.id, userId2: user1.id})
+        console.log('ВХОД');
+        const user_friend2 = await this.user_FriendRep.create({userId1: user2.id, userId2: user1.id});
+        const author = await this.authorService.getAuthorByUserId(user1.id);
+        await this.authorService.subscribe(user2.id, author.id);
       }
     } catch (error) {
       console.log(error);
@@ -176,23 +182,33 @@ export class UsersService {
   //хотя в объявлении точно указано number, просто чудеса ебать :)
   async deleteFriend(userId1: number, userId2: number) {
     const friends = await this.getFriendsByUserId(userId1);
+    friends.forEach(friend => console.log(friend.id));
     //Здесь приходится делать нестрогое сравнение из-за выше описанной хуеты
     const thisFriend = friends.find(friend => friend.id == userId2);
     if (!thisFriend) {
       throw new HttpException('А вы и не дружите. Лох.', HttpStatus.BAD_REQUEST);
     }
-    await this.user_FriendRep.destroy({
-      where: {
-        userId1,
-        userId2,
-      }
-    });
-    await this.user_FriendRep.destroy({
-      where: {
-        userId1: userId2,
-        userId2: userId1,
-      }
-    });
+    try {
+      await this.user_FriendRep.destroy({
+        where: {
+          userId1,
+          userId2,
+        }
+      });
+      const author2 = await this.authorService.getAuthorByUserId(userId2);
+      await this.authorService.unsubscribe(userId1, author2.id);
+      await this.user_FriendRep.destroy({
+        where: {
+          userId1: userId2,
+          userId2: userId1,
+        }
+      });
+      const author1 = await this.authorService.getAuthorByUserId(userId1);
+      await this.authorService.unsubscribe(userId2, author1.id);
+    } catch(e) {
+      console.log('КАКАЯ-ТО ХУЕТА В deleteFriend');
+      console.log(e.message);
+    }
     return { message: 'Ну теперь вы не дружите, кажется' };
   }
 
@@ -210,5 +226,28 @@ export class UsersService {
     });
     return possibleFriends;
     // return allUsers;
+  }
+
+  // async getAllSubGroups(userId: number) {
+  //   const user = await this.userRepository.findOne({
+  //     where: {
+  //       id: userId,
+  //     },
+  //     include: [Author]
+  //   });
+  //   return user.subAuthors;
+  // }
+
+  async getAllSubAuthorsByUserId(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      include: {
+        all: true,
+      }
+    });
+    console.log(user.subAuthors);
+    return user.subAuthors;
   }
 }

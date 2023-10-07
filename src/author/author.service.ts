@@ -139,16 +139,33 @@ export class AuthorService {
     return {message: 'Ну вроде подписался'};
   }
 
+  //Тут та же хрень со стринговым userId, я хз с чем это связано
   async unsubscribe(userId: number, authorId: number) {
     const subscribers = await this.getSubscribersByAuthorId(authorId);
-    const candidate = subscribers.find(subscriber => subscriber.id === userId);
+    console.log('SUBSCRIBERS');
+    console.log(subscribers);
+    const candidate = subscribers.find(subscriber => {
+      console.log(subscriber.id + ':' + userId);
+      console.log(typeof userId);
+      return subscriber.id == userId
+    });
+    console.log('CANDIDATE');
+    console.log(candidate);
     if (!candidate) {
-      throw new HttpException('Данный юзер не подписан на данную группу', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Юзер с id ' + userId + ' не подписан на автора с id ' + authorId, HttpStatus.BAD_REQUEST);
     }
     const author = await this.getAuthorById(authorId);
     author.$remove('subscribers', [userId]);
     return {message: 'Ну вроде отписался'};
   }
+
+  // async getAllSubGrAuthor(userId) {
+  //   const authors = await this.authorRep.findAll({
+  //     where: {
+  //       subscribers: use
+  //     }
+  //   })
+  // }
 
   async updateAvatar(fileName: string, authorId: number) {
     const response = await this.authorRep.update(
