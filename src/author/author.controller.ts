@@ -45,4 +45,11 @@ export class AuthorController {
   ) {
     return this.authorService.unsubscribe(req.userPayload.id, authorId);
   }
+
+  @Get('/getSubsByAuthorId/:authorId')
+  async getSubsByAuthorId(
+    @Param('authorId') authorId: number
+  ) {
+    return this.authorService.getSubscribersByAuthorId(authorId);
+  }
 }

@@ -57,6 +57,13 @@ export class GroupController {
     return this.groupService.deleteGroupById(dto.groupId, req.user.id);
   }
 
+  @Get('/getSubsByGroupId/:groupId')
+  async getSubsByGroupId(
+    @Param('groupId') groupId: number
+  ) {
+    return this.groupService.getSubsByGroupId(groupId);
+  }
+
   // @Get('/getAllSubsByGroupId/:id')
   // async getAllSubsByGroupId(
   //   @Param('id') id: number

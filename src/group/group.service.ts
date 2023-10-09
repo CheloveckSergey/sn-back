@@ -123,6 +123,11 @@ export class GroupService {
   //   return group.subscribers;
   // }
 
+  async getSubsByGroupId(groupId: number) {
+    const author = await this.authorService.getAuthorByGroupId(groupId);
+    const subs = await this.authorService.getSubscribersByAuthorId(author.id);
+    return subs;
+  }
 
   async createAvatar(userId: number, name: string, file: Express.Multer.File) {
     const avatarName = uuid.v4() + '.jpg';
