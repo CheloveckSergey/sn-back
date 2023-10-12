@@ -114,7 +114,10 @@ export class AuthorService {
       where: {
         id: authorId,
       },
-      include: [{model: User}],
+      include: {
+        model: User,
+        as: 'subscribers',
+      },
     });
     const subscribers = author.subscribers.map(sub => {
       let _sub: any = {};

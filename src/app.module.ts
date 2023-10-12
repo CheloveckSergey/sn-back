@@ -39,7 +39,8 @@ import { User_Friend } from "./users/user-friends.model";
       username: 'root',
       password: 'David_2102',
       database: 'sn',
-      models: [User, 
+      models: [
+        User,
         Roles, 
         UserRoles, 
         RefreshToken, 

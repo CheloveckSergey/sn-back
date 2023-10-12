@@ -33,7 +33,7 @@ export class AuthService {
     const user = await this.userService.createUser({...dto, password: hashPassword});
     const tokens = await this.generateTokens(user);
     const refreshToken = await this.refTokRepository.create({userId: user.id, token: tokens.refreshToken});
-    await this.userDescService.createDesc({userId: user.id});
+    await this.userDescService.createDesc(user.id);
     user.$set('refreshToken', refreshToken.id);
     return {id: user.id, login: user.login, tokens, avatar: user.avatar};
   }

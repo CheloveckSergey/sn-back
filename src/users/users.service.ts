@@ -250,4 +250,17 @@ export class UsersService {
     console.log(user.subAuthors);
     return user.subAuthors;
   }
+
+  // async getAllSubsByAuthorId(authorId: number) {
+  //   const author = await this.authorService.getAuthorById(authorId);
+  //   const subs = await this.userRepository.findAll({
+  //     where: {
+  //       subAuthors: [author],
+  //     },
+  //     include: {
+  //       all: true,
+  //     }
+  //   });
+  //   return subs;
+  // }
 }

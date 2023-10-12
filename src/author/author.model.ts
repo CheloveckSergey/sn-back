@@ -19,6 +19,7 @@ interface AuthorCreationAttrs {
   tableName: "authors",
 })
 export class Author extends Model<Author, AuthorCreationAttrs> {
+
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 

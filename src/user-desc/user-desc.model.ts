@@ -2,24 +2,24 @@ import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript
 import { User } from "src/users/users.model";
 
 export interface UserDescCreationAttr {
-  data?: string | undefined,
-  city?: string | undefined,
-  familyStatus?: string | undefined,
-  work?:string | undefined,
-  telephone?: string | undefined,
-  quote?:string | undefined,
+  // data?: string | undefined,
+  // city?: string | undefined,
+  // familyStatus?: string | undefined,
+  // work?:string | undefined,
+  // telephone?: string | undefined,
+  // quote?:string | undefined,
   userId: number,
 }
 
 @Table({
-  tableName: "description",
+  tableName: "user_desc",
 })
 export class UserDesc extends Model<UserDesc, UserDescCreationAttr> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 
   @Column({type: DataType.STRING, allowNull: true})
-  data: string;
+  date: string;
 
   @Column({type: DataType.STRING, allowNull: true})
   city: string;

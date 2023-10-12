@@ -11,34 +11,55 @@ export class UserDescService {
   ) {}
 
   async getDesc(userId: number) {
-    const desc = await this.userDescRepository.findOne({
+    let desc;
+    desc = await this.userDescRepository.findOne({
       where: {
         userId
       }
     });
+    if (!desc) {
+      desc = await this.createDesc(userId);
+    }
     return desc;
   }
 
-  async createDesc({ data, city, familyStatus, work, telephone, quote, userId } : CreateUserDescDto) {
-    const response = await this.userDescRepository.create({userId, data, city, familyStatus, work, telephone, quote});
-    return response
+  async createDesc(userId: number) {
+    const response = await this.userDescRepository.create({userId: userId});
+    return response;
+  }
+  // async createDesc({ data, city, familyStatus, work, telephone, quote, userId } : CreateUserDescDto) {
+  //   const response = await this.userDescRepository.create({userId, data, city, familyStatus, work, telephone, quote});
+  //   return response
+  // }
+
+  async checkDescExistence(userId: number) {
+    const desc = await this.getDesc(userId);
+    if (!desc) {
+      await this.createDesc(userId);
+    }
   }
 
-  async updateData(data: string | undefined, userId: number) {
-    if (data) {
+  async updateDate(date: string | undefined, userId: number) {
+    await this.checkDescExistence(userId);
+    console.log(date);
+    if (date) {
       await this.userDescRepository.update(
         {
-          data
+          date
         }, {
           where: {
-            userId: userId
+            userId
           }
         }
       )
     }
+    return {message: 'Дата успешно обновлена'}
   }
 
   async updateFamilyStatus(familyStatus: string | undefined, userId: number) {
+    await this.checkDescExistence(userId);
+    console.log("FAMILY STATUS");
+    console.log(familyStatus);
     if (familyStatus) {
       await this.userDescRepository.update(
         {
@@ -53,6 +74,7 @@ export class UserDescService {
   }
 
   async updateWork(work: string | undefined, userId: number) {
+    await this.checkDescExistence(userId);
     if (work) {
       await this.userDescRepository.update(
         {
@@ -67,6 +89,7 @@ export class UserDescService {
   }
 
   async updateTelephone(telephone: string | undefined, userId: number) {
+    await this.checkDescExistence(userId);
     if (telephone) {
       await this.userDescRepository.update(
         {
@@ -81,6 +104,7 @@ export class UserDescService {
   }
 
   async updateQuote(quote: string | undefined, userId: number) {
+    await this.checkDescExistence(userId);
     if (quote) {
       await this.userDescRepository.update(
         {

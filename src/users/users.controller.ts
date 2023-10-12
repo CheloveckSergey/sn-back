@@ -90,4 +90,11 @@ export class UsersController {
   ) {
     return this.userService.getFriendsByUserId(req.userPayload.id);
   }
+
+  // @Get('/getAllSubsByAuthorId/:authorId')
+  // async getAllSubsByAuthorId(
+  //   @Param('authorId') authorId: number,
+  // ) {
+  //   return this.userService.getAllSubsByAuthorId(authorId);
+  // }
 }
