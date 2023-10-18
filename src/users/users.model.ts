@@ -1,19 +1,19 @@
-import { BelongsToMany, Column, DataType, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { RefreshToken } from "src/auth/refreshTokens.model";
-import { GroupModerator } from "src/group/group-moderator.mode";
-import { Group } from "src/group/group.model";
-import { PostLike } from "src/likes/likes.model";
-import { Post } from "src/posts/posts.model";
+import { Like } from "src/likes/likes.model";
 import { Roles } from "src/roles/roles.model";
 import { UserRoles } from "src/roles/user-roles.model";
 import { Author } from "src/author/author.model";
-import { Comment } from "src/comments/comments.model";
 import { Author_Subs } from "src/author/author-subs.model";
+import { GroupMember } from "src/group/group-members.model";
 import { User_Friend } from "./user-friends.model";
+import { UserDesc } from "src/user-desc/user-desc.model";
 
 interface UserCreationAttrs {
   login: string,
   password: string,
+  avatar?: string | undefined,
+  authorId: number,
 }
 
 @Table({
@@ -38,27 +38,28 @@ export class User extends Model<User, UserCreationAttrs> {
   @HasOne(() => RefreshToken)
   refreshToken: RefreshToken;
 
-  @HasMany(() => PostLike)
-  postUserLikes: PostLike[];
+  @HasMany(() => Like)
+  likes: Like;
 
-  @HasMany(() => Group)
-  groupAdmin: Group[];
+  // @HasMany(() => Comment)
+  // comments: Comment[];
 
-  @BelongsToMany(() => Group, () => GroupModerator)
-  groupModerator: Group[];
+  @HasMany(() => GroupMember)
+  groupMembers: GroupMember[];
 
-  @BelongsToMany(() => Group, () => GroupModerator)
-  subGroups: Group[];
+  @ForeignKey(() => Author)
+  @Column({type: DataType.INTEGER, allowNull: false, unique: true})
+  authorId: number;
 
-  @HasOne(() => Author)
+  @BelongsTo(() => Author)
   author: Author;
-
-  @HasMany(() => Comment)
-  comments: Comment[];
 
   @BelongsToMany(() => Author, () => Author_Subs)
   subAuthors: Author[];
 
-  // @BelongsToMany(() => User, () => User_Friend)
-  // friends: User[];
+  @BelongsToMany(() => User, () => User_Friend)
+  friends: User[];
+
+  @HasOne(() => UserDesc)
+  userDesc: UserDesc;
 }

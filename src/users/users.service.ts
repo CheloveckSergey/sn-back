@@ -8,7 +8,7 @@ import { writeFile } from "fs/promises";
 import * as path from "path";
 import { AuthorService } from 'src/author/author.service';
 import { User_Friend } from './user-friends.model';
-import { Author } from 'src/author/author.model';
+import { AuthorTypeCodes } from 'src/author/author-types.model';
 
 type OneUser = {
   id: number,
@@ -27,55 +27,48 @@ export class UsersService {
     private authorService: AuthorService,
   ) {}
 
-  async createUser(dto: CreateUserDto) {
-    const user = await this.userRepository.create(dto);
-    const role = await this.rolesService.getRoleByValue(3);
-    user.$set('roles', [role.id]);
-    const author = this.authorService.createAuthor({name: user.login, authorType: 'user', authorId: user.id});
-    return user;
-  }
-
   async getAllUsers() {
-    const users = await this.userRepository.findAll({include: {all: true}});
+    const users = await this.userRepository.findAll();
     return users;
   }
-
+  
   async getUserById(id: number, curUserId?: number) {
     const user = await this.userRepository.findOne({
       where: {id},
     });
-    let _user: OneUser;
-    if (!curUserId) {
-      _user = {
-        id: user.id,
-        login: user.login,
-        avatar: user.avatar,
-        isFriend: false,
-      };
-      return _user;
-    }
-    const user_friend = await this.user_FriendRep.findOne({
-      where: {
-        userId1: id,
-        userId2: curUserId,
-      }
-    })
-    if (user_friend) {
-      _user = {
-        id: user.id,
-        login: user.login,
-        avatar: user.avatar,
-        isFriend: true,
-      }
-    } else {
-      _user = {
-        id: user.id,
-        login: user.login,
-        avatar: user.avatar,
-        isFriend: false,
-      }
-    }
-    return _user;
+    return user;
+    // let _user: OneUser;
+    // if (!curUserId) {
+    //   _user = {
+    //     id: user.id,
+    //     login: user.login,
+    //     avatar: user.avatar,
+    //     isFriend: false,
+    //   };
+    //   return _user;
+    // }
+    // const user_friend = await this.user_FriendRep.findOne({
+    //   where: {
+    //     userId1: id,
+    //     userId2: curUserId,
+    //   }
+    // })
+    // if (user_friend) {
+    //   _user = {
+    //     id: user.id,
+    //     login: user.login,
+    //     avatar: user.avatar,
+    //     isFriend: true,
+    //   }
+    // } else {
+    //   _user = {
+    //     id: user.id,
+    //     login: user.login,
+    //     avatar: user.avatar,
+    //     isFriend: false,
+    //   }
+    // }
+    // return _user;
   }
 
   async getUserByLogin(login: string) {
@@ -83,12 +76,20 @@ export class UsersService {
     return user;
   }
 
-  async getAvatarById(id: number) {
-    const avatar = await this.userRepository.findOne({
-      where: {id},
-      attributes: ['avatar'],
-    });
-    return avatar;
+  // async getAvatarById(id: number) {
+  //   const avatar = await this.userRepository.findOne({
+  //     where: {id},
+  //     attributes: ['avatar'],
+  //   });
+  //   return avatar;
+  // }
+
+  async createUser(dto: CreateUserDto) {
+    const author = await this.authorService.createAuthor(dto.login, AuthorTypeCodes.USER);
+    const user = await this.userRepository.create({login: dto.login, password: dto.password, authorId: author.id});
+    const role = await this.rolesService.getRoleByValue(3);
+    user.$set('roles', [role.id]);
+    return user;
   }
 
   async createAvatar(id: number, file: Express.Multer.File) {
@@ -102,8 +103,12 @@ export class UsersService {
         }
       }
     );
-    const author = await this.authorService.getAuthorByUserId(id);
-    await this.authorService.updateAvatar(avatarName, author.id);
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      }
+    })
+    await this.authorService.updateAvatar(avatarName, user.authorId);
     return {message: 'Ну вроде нормал'};
   }
 
@@ -126,8 +131,7 @@ export class UsersService {
       });
       if (!possUser_Friend1) {
         const user_friend1 = await this.user_FriendRep.create({userId1: user1.id, userId2: user2.id});
-        const author = await this.authorService.getAuthorByUserId(user2.id);
-        await this.authorService.subscribe(user1.id, author.id);
+        await this.authorService.subscribe(user1.id, user2.authorId);
       }
       const possUser_Friend2 = await this.user_FriendRep.findOne({
         where: {
@@ -138,8 +142,7 @@ export class UsersService {
       if (!possUser_Friend2) {
         console.log('ВХОД');
         const user_friend2 = await this.user_FriendRep.create({userId1: user2.id, userId2: user1.id});
-        const author = await this.authorService.getAuthorByUserId(user1.id);
-        await this.authorService.subscribe(user2.id, author.id);
+        await this.authorService.subscribe(user2.id, user1.authorId);
       }
     } catch (error) {
       console.log(error);
@@ -182,7 +185,7 @@ export class UsersService {
   //хотя в объявлении точно указано number, просто чудеса ебать :)
   async deleteFriend(userId1: number, userId2: number) {
     const friends = await this.getFriendsByUserId(userId1);
-    friends.forEach(friend => console.log(friend.id));
+    // friends.forEach(friend => console.log(friend.id));
     //Здесь приходится делать нестрогое сравнение из-за выше описанной хуеты
     const thisFriend = friends.find(friend => friend.id == userId2);
     if (!thisFriend) {
@@ -195,16 +198,24 @@ export class UsersService {
           userId2,
         }
       });
-      const author2 = await this.authorService.getAuthorByUserId(userId2);
-      await this.authorService.unsubscribe(userId1, author2.id);
+      const user2 = await this.userRepository.findOne({
+        where: {
+          id: userId2,
+        }
+      });
+      await this.authorService.unsubscribe(userId1, user2.authorId);
       await this.user_FriendRep.destroy({
         where: {
           userId1: userId2,
           userId2: userId1,
         }
       });
-      const author1 = await this.authorService.getAuthorByUserId(userId1);
-      await this.authorService.unsubscribe(userId2, author1.id);
+      const user1 = await this.userRepository.findOne({
+        where: {
+          id: userId1,
+        }
+      });
+      await this.authorService.unsubscribe(userId2, user1.authorId);
     } catch(e) {
       console.log('КАКАЯ-ТО ХУЕТА В deleteFriend');
       console.log(e.message);

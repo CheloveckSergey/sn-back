@@ -4,6 +4,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 type CrBody = {
+  authorId: number,
   text: string,
   creationId: number
 }
@@ -13,48 +14,47 @@ export class CommentsController {
 
   constructor(private commentsService: CommentsService) {}
 
-  @Get('/getCommentsByImageId/:imageId')
-  async getCommentsByImageId(
-    @Param('imageId') imageId: number
+  @Get('/getCommentsToCreationId/:id')
+  async getCommentsToCreationId(
+    @Param('id') creationId: number
   ) {
-    return this.commentsService.getCommentsByImageId(imageId);
+    return this.commentsService.getAllCommentsToCreationId(creationId);
   }
 
-  @Get('/getCommentsByPostId/:postId')
-  async getCommentsByPostId(
-    @Param('postId') postId: number
-  ) {
-    return this.commentsService.getCommentsByPostId(postId);
-  }
+  // @Get('/getCommentsByPostId/:postId')
+  // async getCommentsByPostId(
+  //   @Param('postId') postId: number
+  // ) {
+  //   return this.commentsService.getCommentsByPostId(postId);
+  // }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/createImageComment')
+  @Post('/createComment')
   async createImageComment(
-    @Body() crBody: CrBody,
+    @Body() dto: CrBody,
     @Req() req,
   ) {
-    console.log('imageController');
-    return this.commentsService.createComment(req.userPayload.id, crBody.text, 'image', crBody.creationId);
+    return this.commentsService.createComment(dto.authorId, dto.text, dto.creationId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('img'))
-  @Post('/createPostComment')
-  async createPostComment(
-    @Body() crBody: CrBody,
-    @Req() req,
-  ) {
-    return this.commentsService.createComment(req.userPayload.id, crBody.text, 'post', crBody.creationId);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @UseInterceptors(FileInterceptor('img'))
+  // @Post('/createPostComment')
+  // async createPostComment(
+  //   @Body() crBody: CrBody,
+  //   @Req() req,
+  // ) {
+  //   return this.commentsService.createComment(req.userPayload.id, crBody.text, 'post', crBody.creationId);
+  // }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('/createGroupPost')
-  @UseInterceptors(FileInterceptor('img'))
-  createPostGroup(@Body() body,
-  @Req() req,
-  @UploadedFile() file: Express.Multer.File) {
-    console.log('comController');
-    console.log(body);
-    return 'lololo';
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Post('/createGroupPost')
+  // @UseInterceptors(FileInterceptor('img'))
+  // createPostGroup(@Body() body,
+  // @Req() req,
+  // @UploadedFile() file: Express.Multer.File) {
+  //   console.log('comController');
+  //   console.log(body);
+  //   return 'lololo';
+  // }
 }

@@ -14,14 +14,14 @@ export class GroupController {
     return this.groupService.getAllGroups();
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/getGroupByName/:name')
-  async getGroupByName(
-    @Param('name') name: string,
-    @Req() req
-  ) {
-    return this.groupService.getGroupByName(name, req.userPayload.id);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('/getGroupByName/:name')
+  // async getGroupByName(
+  //   @Param('name') name: string,
+  //   @Req() req
+  // ) {
+  //   return this.groupService.getGroupByName(name, req.userPayload.id);
+  // }
 
   @Get('/getGroupById/:id')
   async getGroupById(
@@ -30,39 +30,39 @@ export class GroupController {
     return this.groupService.getGroupById(id);
   }
 
-  @Get('/getAdminGroupsByUserId/:id')
-  async getAdminGroupsByUserId(
-    @Param('id') id: number
-  ) {
-    return this.groupService.getAdminGroupsByUserId(id);
-  }
+  // @Get('/getAdminGroupsByUserId/:id')
+  // async getAdminGroupsByUserId(
+  //   @Param('id') id: number
+  // ) {
+  //   return this.groupService.getAdminGroupsByUserId(id);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/createGroup')
   @UseInterceptors(FileInterceptor('img'))
   async createGroup(
-    @Body() dto: CreateGroupDto,
+    @Body() dto: { name: string, userId: number },
     @Req() req,
     @UploadedFile() file: Express.Multer.File
   ) {
-    return this.groupService.createGroup(req.userPayload.id, dto.name, file);
+    return this.groupService.createGroup(dto.userId, dto.name, file);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('/deleteGroupById')
-  async deleteGroupById(
-    @Body() dto: DeleteGrouDto,
-    @Req() req
-  ) {
-    return this.groupService.deleteGroupById(dto.groupId, req.user.id);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Post('/deleteGroupById')
+  // async deleteGroupById(
+  //   @Body() dto: DeleteGrouDto,
+  //   @Req() req
+  // ) {
+  //   return this.groupService.deleteGroupById(dto.groupId, req.user.id);
+  // }
 
-  @Get('/getSubsByGroupId/:groupId')
-  async getSubsByGroupId(
-    @Param('groupId') groupId: number
-  ) {
-    return this.groupService.getSubsByGroupId(groupId);
-  }
+  // @Get('/getSubsByGroupId/:groupId')
+  // async getSubsByGroupId(
+  //   @Param('groupId') groupId: number
+  // ) {
+  //   return this.groupService.getSubsByGroupId(groupId);
+  // }
 
   // @Get('/getAllSubsByGroupId/:id')
   // async getAllSubsByGroupId(

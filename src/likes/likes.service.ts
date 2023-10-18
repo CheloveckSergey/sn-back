@@ -1,59 +1,57 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { PostLike } from './likes.model';
-import { PULikeReqDto } from './dto';
+import { Like } from './likes.model';
 
 @Injectable()
-export class PULikeService {
+export class LikesService {
 
   constructor(
-    @InjectModel(PostLike) private puLikeReposiroty: typeof PostLike,
+    @InjectModel(Like) private likeRep: typeof Like,
   ) {}
-  
-  async createPULike(dto: PULikeReqDto) {
-    const allPULikes = await this.getAllPULikes();
-    if (allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
-      throw new HttpException('Такой лайк уже существует', HttpStatus.BAD_REQUEST);
-    }
-    const puLike = await this.puLikeReposiroty.create({postId: dto.postUserId, userId: dto.userId});
-    return puLike
-  }
 
-  private async getAllPULikes() {
-    const allPULikes = await this.puLikeReposiroty.findAll();
-    return allPULikes;
-  }
-
-  async getAllPULikesByPostId(postId: number) {
-    const puLikes = await this.puLikeReposiroty.findAll({
+  private async getLike(userId: number, creationId: number) {
+    const like = await this.likeRep.findOne({
       where: {
-        postId,
+        userId,
+        creationId,
       }
     });
-    return puLikes;
+    return like;
   }
 
-  async getAllPULikesByUserId(userId: number) {
-    const puLikes = await this.puLikeReposiroty.findAll({
+  async getLikesByCreationId(creationId: number) {
+    const likes = await this.likeRep.findAll({
+      where: {
+        creationId,
+      }
+    });
+    return likes;
+  }
+
+  async getLikesByUserId(userId: number) {
+    const likes = await this.likeRep.findAll({
       where: {
         userId,
       }
     });
-    return puLikes;
+    return likes;
   }
 
+  async createLike(userId: number, creationId: number) {
+    const candidate = await this.getLike(userId, creationId);
+    if (candidate) {
+      throw new HttpException('Такой лайк уже существует', HttpStatus.BAD_REQUEST);
+    }
+    const like = await this.likeRep.create({userId: userId, creationId: creationId});
+    return like;
+  }
 
-  async deletePULike(dto: PULikeReqDto) {
-    const allPULikes = await this.getAllPULikes();
-    if (!allPULikes.find(puLike => puLike.userId === dto.userId && puLike.postId === dto.postUserId)) {
+  async deleteLike(userId: number, creationId: number) {
+    const candidate = await this.getLike(userId, creationId);
+    if (!candidate) {
       throw new HttpException('Такого лайка не существует', HttpStatus.BAD_REQUEST);
     }
-    const puLike = await this.puLikeReposiroty.destroy({
-      where: {
-        userId: dto.userId,
-        postId: dto.postUserId,
-      }
-    });
-    return puLike;
+    candidate.destroy();
+    return {message: 'Ну вроде удалено, так сказац'};
   }
 }

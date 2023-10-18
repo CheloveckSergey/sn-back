@@ -1,12 +1,10 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
-import { Author } from "src/author/author.model";
-import { Comment } from "src/comments/comments.model";
-import { PostLike } from "src/likes/likes.model";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { Creation } from "src/creations/creations.model";
+import { PostImage } from "src/post-images/post-images.model";
 
 export interface PostCreationAttrs {
-  authorId: number,
-  description: string | undefined
-  image: string | undefined,
+  description: string | undefined,
+  creationId: number,
 }
 
 @Table({
@@ -17,21 +15,14 @@ export class Post extends Model<Post, PostCreationAttrs> {
   id: number;
 
   @Column({type: DataType.STRING, allowNull: true})
-  description: string;
+  description: string | undefined;
 
-  @Column({type: DataType.STRING, allowNull: true})
-  image: string;
+  @ForeignKey(() => Creation)
+  creationId: number;
 
-  @ForeignKey(() => Author)
-  @Column({type: DataType.INTEGER, allowNull: false})
-  authorId: number;
+  @BelongsTo(() => Creation)
+  creation: Creation;
 
-  @HasMany(() => PostLike)
-  postLikes: PostLike[];
-
-  @BelongsTo(() => Author)
-  author: Author;
-
-  @HasMany(() => Comment)
-  comments: Comment[]
+  @HasMany(() => PostImage)
+  postImages: PostImage[];
 }

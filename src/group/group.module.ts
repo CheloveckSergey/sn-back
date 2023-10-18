@@ -3,18 +3,21 @@ import { GroupController } from './group.controller';
 import { GroupService } from './group.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Group } from './group.model';
-import { GroupSubscriber } from './group-subscriber.model';
 import { GroupDesc } from './group-desc.model';
-import { UsersModule } from 'src/users/users.module';
-import { GroupModerator } from './group-moderator.mode';
 import { AuthorModule } from 'src/author/author.module';
+import { GMType } from './gmTypes.model';
+import { GroupMember } from './group-members.model';
 
 @Module({
   controllers: [GroupController],
   providers: [GroupService],
   imports: [
-    SequelizeModule.forFeature([Group, GroupSubscriber, GroupDesc, GroupModerator]),
-    UsersModule,
+    SequelizeModule.forFeature([
+      Group, 
+      GroupDesc, 
+      GMType,
+      GroupMember,
+    ]),
     AuthorModule,
   ],
   exports: [

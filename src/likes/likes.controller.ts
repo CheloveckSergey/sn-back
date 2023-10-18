@@ -1,37 +1,43 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { PULikeService } from './likes.service';
-import { PULikeReqDto } from './dto';
+import { LikesService } from './likes.service';
 
-@Controller('postLikes')
-export class PULikesController {
+@Controller('likes')
+export class LikesController {
 
-  constructor(private puLikeService: PULikeService) {}
+  constructor(private likesService: LikesService) {}
 
-  @Get('/getByPostId/:id')
-  async getByPostId(
-    @Param('id') id: number
+  // @Get('/getByPostId/:id')
+  // async getByPostId(
+  //   @Param('id') id: number
+  // ) {
+  //   return this.puLikeService.getAllPULikesByPostId(id);
+  // }
+
+  // @Get('/getByUserId/:id')
+  // async getByUserId(
+  //   @Param('id') id: number
+  // ) {
+  //   return this.puLikeService.getAllPULikesByUserId(id);
+  // }
+
+  @Get('/getByCreationId/:id')
+  async getByCreationId(
+    @Param('id') creationId: number
   ) {
-    return this.puLikeService.getAllPULikesByPostId(id);
+    return this.likesService.getLikesByCreationId(creationId);
+  }
+  
+  @Post('/createLike')
+  async createtLike(
+    @Body() dto: {userId: number, creationId: number}
+  ) {
+    return this.likesService.createLike(dto.userId, dto.creationId);
   }
 
-  @Get('/getByUserId/:id')
-  async getByUserId(
-    @Param('id') id: number
+  @Post('deleteLike')
+  async deleteLike(
+    @Body() dto: {userId: number, creationId: number}
   ) {
-    return this.puLikeService.getAllPULikesByUserId(id);
-  }
-
-  @Post('/createPostLike')
-  async createPostLike(
-    @Body() dto: PULikeReqDto
-  ) {
-    return this.puLikeService.createPULike(dto);
-  }
-
-  @Post('deletePostLike')
-  async deletePostLike(
-    @Body() dto: PULikeReqDto
-  ) {
-    return this.puLikeService.deletePULike(dto);
+    return this.likesService.deleteLike(dto.userId, dto.creationId);
   }
 }

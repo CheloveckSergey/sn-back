@@ -7,19 +7,19 @@ export class AuthorController {
 
   constructor(private authorService: AuthorService) {}
 
-  @Get('/getAuthorByName/:name')
-  async getAuthorByName(
-    @Param('name') name: string
-  ) {
-    return this.authorService.getAuthorByName(name);
-  }
+  // @Get('/getAuthorByName/:name')
+  // async getAuthorByName(
+  //   @Param('name') name: string
+  // ) {
+  //   return this.authorService.getAuthorByName(name);
+  // }
 
-  @Get('/getAuthorByNameWithAll/:name')
-  async getAuthorByNameWithAll(
-    @Param('name') name: string
-  ) {
-    return this.authorService.getAuthorByName(name);
-  }
+  // @Get('/getAuthorByNameWithAll/:name')
+  // async getAuthorByNameWithAll(
+  //   @Param('name') name: string
+  // ) {
+  //   return this.authorService.getAuthorByName(name);
+  // }
 
   @Get('/getAuthorById/:id')
   async getAuthorById(

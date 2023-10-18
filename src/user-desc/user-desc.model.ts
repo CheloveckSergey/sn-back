@@ -1,4 +1,4 @@
-import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { User } from "src/users/users.model";
 
 export interface UserDescCreationAttr {
@@ -38,5 +38,8 @@ export class UserDesc extends Model<UserDesc, UserDescCreationAttr> {
 
   @ForeignKey(() => User)
   @Column({type: DataType.INTEGER, unique: true, allowNull: false})
-  userId: number
+  userId: number;
+
+  @BelongsTo(() => User)
+  user: User;
 }

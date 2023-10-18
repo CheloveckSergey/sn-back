@@ -1,15 +1,13 @@
-import { BelongsToMany, Column, DataType, ForeignKey, HasOne, Model, Table } from "sequelize-typescript";
-import { User } from "src/users/users.model";
-import { GroupModerator } from "./group-moderator.mode";
-import { GroupSubscriber } from "./group-subscriber.model";
-import { GroupDesc } from "./group-desc.model";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { GroupMember } from "./group-members.model";
+// import { GroupDesc } from "./group-desc.model";
 import { Author } from "src/author/author.model";
 
 
 interface GroupCreationAttrs {
   name: string,
-  adminId: number,
   avatar?: string,
+  authorId: number,
 }
 
 @Table({
@@ -25,19 +23,16 @@ export class Group extends Model<Group, GroupCreationAttrs> {
   @Column({type: DataType.STRING, allowNull: true})
   avatar: string;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false})
-  adminId: number;
+  @HasMany(() => GroupMember)
+  groupMembers: GroupMember[];
 
-  @BelongsToMany(() => User, () => GroupModerator)
-  moderators: User[];
+  // @HasOne(() => GroupDesc)
+  // description: GroupDesc;
 
-  @BelongsToMany(() => User, () => GroupSubscriber)
-  subscribers: User[];
+  @ForeignKey(() => Author)
+  @Column({type: DataType.INTEGER, unique: true, allowNull: false})
+  authorId: number;
 
-  @HasOne(() => GroupDesc)
-  description: GroupDesc;
-
-  @HasOne(() => Author)
+  @BelongsTo(() => Author)
   author: Author;
 }

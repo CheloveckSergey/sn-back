@@ -38,10 +38,10 @@ export class UsersController {
     return this.userService.getUserById(id, req.userPayload.id);
   }
 
-  @Get('/avatar/:id')
-  getAvatar(@Param('id') id: number) {
-    return this.userService.getAvatarById(id);
-  }
+  // @Get('/avatar/:id')
+  // getAvatar(@Param('id') id: number) {
+  //   return this.userService.getAvatarById(id);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/createAvatar')

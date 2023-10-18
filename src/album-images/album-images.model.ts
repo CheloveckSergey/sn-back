@@ -1,25 +1,22 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { Album } from "src/albums/albums.model";
 import { Creation } from "src/creations/creations.model";
-import { User } from "src/users/users.model";
 
-interface LikeCreationAttrs {
-  userId: number,
+interface AICreationAttrs {
+  value: string,
   creationId: number,
+  albumId: number,
 }
 
 @Table({
-  tableName: "likes",
+  tableName: "album_images",
 })
-export class Like extends Model<Like, LikeCreationAttrs> {
+export class AlbumImage extends Model<AlbumImage, AICreationAttrs> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false})
-  userId: number;
-
-  @BelongsTo(() => User)
-  user: User;
+  @Column({type: DataType.STRING, allowNull: false, unique: false})
+  value: string;
 
   @ForeignKey(() => Creation)
   @Column({type: DataType.INTEGER, allowNull: false})
@@ -27,4 +24,11 @@ export class Like extends Model<Like, LikeCreationAttrs> {
 
   @BelongsTo(() => Creation)
   creation: Creation;
+
+  @ForeignKey(() => Album)
+  @Column({type: DataType.INTEGER})
+  albumId: number;
+
+  @BelongsTo(() => Album)
+  album: Album;
 }
