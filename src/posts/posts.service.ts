@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Post } from './posts.model';
-import { writeFile } from 'fs/promises';
-import * as uuid from 'uuid';
-import * as path from 'path';
-import { AuthorService } from 'src/author/author.service';
-import { GroupService } from 'src/group/group.service';
-import { UsersService } from 'src/users/users.service';
 import { Op } from 'sequelize';
-import sequelize from 'sequelize';
 import { CreationsService } from 'src/creations/creations.service';
 import { PostImagesService } from 'src/post-images/post-images.service';
 import { CrTypeCodes } from 'src/creations/creation-types.model';
@@ -66,7 +59,10 @@ export class PostsService {
         }
       },
       include: [
-        PostImage,
+        {
+          model: PostImage,
+          as: 'postImages',
+        },
         {
           model: Creation,
           as: 'creation',
@@ -82,7 +78,12 @@ export class PostsService {
   }
 
   async getAllPostsByAuthorId(authorId: number) {
+    console.log('GET_ALL_POSTS_BY_AUTHOR_ID');
+    console.log('AUTHOR_ID: ' + authorId);
     const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, authorId);
+    if (!creations.length) {
+      return [];
+    }
     const posts = await this.postRepository.findAll({
       where: {
         creationId: {
@@ -90,7 +91,64 @@ export class PostsService {
         }
       },
       include: [
-        PostImage,
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            {
+              model: Like,
+              as: 'likes',
+            },
+            {
+              model: Comment,
+              as: 'comments',
+              include: [
+                {
+                  model: Creation,
+                  as: 'ownCreation',
+                  include: [
+                    {
+                      model: Author,
+                      as: 'author',
+                    },
+                    {
+                      model: Like,
+                      as: 'likes',
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              model: Author,
+              as: 'author',
+            },
+          ]
+        },
+        {
+          model: PostImage,
+          as: 'postImages',
+          include: [
+            {
+              model: Creation,
+              as: 'creation',
+              include: [
+                {
+                  model: Like,
+                  as: 'likes',
+                },
+                {
+                  model: Comment,
+                  as: 'comments',
+                },
+                {
+                  model: Author,
+                  as: 'author',
+                },
+              ]
+            }
+          ]
+        },
         {
           model: Creation,
           as: 'creation',
@@ -105,6 +163,8 @@ export class PostsService {
   }
 
   async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number) {
+    console.log("CREATE_POST_BY_AUTHOR");
+    console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId);
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.POST);
     const post = await this.postRepository.create({description, creationId: creation.id});
     for (let imageFile of imageFiles) {

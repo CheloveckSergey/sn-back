@@ -6,8 +6,8 @@ export enum AuthorTypeCodes {
 }
 
 export enum AuthorTypeNames {
-  USER = 10,
-  GROUP = 20,
+  USER = 'user',
+  GROUP = 'group',
 }
 
 interface ATCreationAttrs {

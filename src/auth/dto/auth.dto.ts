@@ -1,8 +1,11 @@
+import { Author } from "src/author/author.model";
+
 export interface AuthDto {
   id: number,
   login: string,
   tokens: Tokens,
   avatar: string | undefined | null,
+  author: Author,
 }
 
 export interface Tokens {

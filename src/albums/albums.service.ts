@@ -4,6 +4,7 @@ import { Album } from './albums.model';
 import { CreationsService } from 'src/creations/creations.service';
 import { CrTypeCodes } from 'src/creations/creation-types.model';
 import { Op } from 'sequelize';
+import { Creation } from 'src/creations/creations.model';
 
 @Injectable()
 export class AlbumsService {
@@ -17,7 +18,10 @@ export class AlbumsService {
     const album = await this.albumRep.findOne({
       where: {
         id,
-      }
+      },
+      include: [
+        Creation,
+      ]
     });
     return album;
   }
@@ -29,7 +33,10 @@ export class AlbumsService {
         creationId: {
           [Op.or]: creations.map(creation => creation.id),
         }
-      }
+      },
+      include: [
+        Creation,
+      ]
     });
     return albums;
   }

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Author } from './author.model';
 import { User } from 'src/users/users.model';
-import { AuthorType, AuthorTypeCodes } from './author-types.model';
+import { AuthorType, AuthorTypeCodes, AuthorTypeNames } from './author-types.model';
 
 export type _Author = {
   id: number,
@@ -191,5 +191,17 @@ export class AuthorService {
       }
     );
     return response;
+  }
+
+  async createAuthorType(authorTypeCode: AuthorTypeCodes, authorTypeName: AuthorTypeNames) {
+    if (!Object.values(AuthorTypeCodes).includes(authorTypeCode)) {
+      throw new HttpException('Такого кода типа автора не существует', HttpStatus.BAD_REQUEST);
+    }
+    if (!Object.values(AuthorTypeNames).includes(authorTypeName)) {
+      throw new HttpException('Такого названия типа автора не существует', HttpStatus.BAD_REQUEST);
+    }
+
+    const authorType = await this.authorTypeRep.create({code: authorTypeCode, name: authorTypeName});
+    return authorType;
   }
 }

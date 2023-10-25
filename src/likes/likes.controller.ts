@@ -34,7 +34,7 @@ export class LikesController {
     return this.likesService.createLike(dto.userId, dto.creationId);
   }
 
-  @Post('deleteLike')
+  @Post('/deleteLike')
   async deleteLike(
     @Body() dto: {userId: number, creationId: number}
   ) {

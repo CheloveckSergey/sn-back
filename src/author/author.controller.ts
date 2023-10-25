@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthorService } from './author.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthorTypeCodes, AuthorTypeNames } from './author-types.model';
 
 @Controller('author')
 export class AuthorController {
@@ -51,5 +52,12 @@ export class AuthorController {
     @Param('authorId') authorId: number
   ) {
     return this.authorService.getSubscribersByAuthorId(authorId);
+  }
+
+  @Post('/createType')
+  async createType(
+    @Body() dto: { code: AuthorTypeCodes, name: AuthorTypeNames },
+  ) {
+    return this.authorService.createAuthorType(dto.code, dto.name);
   }
 }

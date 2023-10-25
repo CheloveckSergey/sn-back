@@ -66,8 +66,8 @@ export class CommentsService {
 
   async deleteComment(commentId: number) {
     const comment = await this.getCommentById(commentId);
-    const ownCreation = await this.creationsService.getCreationById(comment.ownCreationId);
-    await ownCreation.destroy();
+    // const ownCreation = await this.creationsService.getCreationById(comment.ownCreationId);
+    // await ownCreation.destroy();
     await comment.destroy();
     return {message: 'Коммент успешно удалён'}
   }

@@ -41,9 +41,6 @@ export class User extends Model<User, UserCreationAttrs> {
   @HasMany(() => Like)
   likes: Like;
 
-  // @HasMany(() => Comment)
-  // comments: Comment[];
-
   @HasMany(() => GroupMember)
   groupMembers: GroupMember[];
 

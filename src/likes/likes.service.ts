@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Like } from './likes.model';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class LikesService {
@@ -23,7 +24,10 @@ export class LikesService {
     const likes = await this.likeRep.findAll({
       where: {
         creationId,
-      }
+      },
+      include: [
+        User,
+      ]
     });
     return likes;
   }

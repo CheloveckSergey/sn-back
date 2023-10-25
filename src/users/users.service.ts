@@ -9,6 +9,7 @@ import * as path from "path";
 import { AuthorService } from 'src/author/author.service';
 import { User_Friend } from './user-friends.model';
 import { AuthorTypeCodes } from 'src/author/author-types.model';
+import { Author } from 'src/author/author.model';
 
 type OneUser = {
   id: number,
@@ -28,13 +29,20 @@ export class UsersService {
   ) {}
 
   async getAllUsers() {
-    const users = await this.userRepository.findAll();
+    const users = await this.userRepository.findAll({
+      include: [
+        Author,
+      ]
+    });
     return users;
   }
   
   async getUserById(id: number, curUserId?: number) {
     const user = await this.userRepository.findOne({
       where: {id},
+      include: [
+        Author,
+      ]
     });
     return user;
     // let _user: OneUser;
@@ -72,7 +80,14 @@ export class UsersService {
   }
 
   async getUserByLogin(login: string) {
-    const user = await this.userRepository.findOne({where: {login}});
+    const user = await this.userRepository.findOne({
+      where: {
+        login,
+      },
+      include: {
+        all: true,
+      }
+    });
     return user;
   }
 

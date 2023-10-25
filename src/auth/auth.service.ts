@@ -35,7 +35,7 @@ export class AuthService {
     const refreshToken = await this.refTokRepository.create({userId: user.id, token: tokens.refreshToken});
     await this.userDescService.createDesc(user.id);
     user.$set('refreshToken', refreshToken.id);
-    return {id: user.id, login: user.login, tokens, avatar: user.avatar};
+    return {id: user.id, login: user.login, tokens, avatar: user.avatar, author: user.author};
   }
 
   async login(dto: CreateUserDto): Promise<AuthDto> {
@@ -48,6 +48,8 @@ export class AuthService {
       throw new HttpException('Неверный пароль', HttpStatus.BAD_REQUEST);
     }
     const tokens = await this.generateTokens(user);
+    console.log("РЕФРЕШТОКЕН: ");
+    console.log(tokens.refreshToken.length);
     const refreshTok = await this.refTokRepository.findOne({
       where: {
         userId: user.id,
@@ -64,7 +66,7 @@ export class AuthService {
     } else {
       await this.refTokRepository.create({userId: user.id, token: tokens.refreshToken});
     }
-    return {id: user.id, login: user.login, tokens, avatar: user.avatar};
+    return {id: user.id, login: user.login, tokens, avatar: user.avatar, author: user.author};
   }
 
   async refresh(refreshToken: string): Promise<AuthDto> {
@@ -85,7 +87,7 @@ export class AuthService {
     }
     const user = await this.userService.getUserByLogin(payload.login);
     const tokens = await this.generateTokens(user);
-    return {id: user.id, login: user.login, tokens, avatar: user.avatar};
+    return {id: user.id, login: user.login, tokens, avatar: user.avatar, author: user.author};
   }
 
   async logout(userId: number) {

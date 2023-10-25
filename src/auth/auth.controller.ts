@@ -14,8 +14,21 @@ export class AuthController {
     @Response() res
   ) {
     const authDto = await this.authService.registration(userDto);
-    res.cookie('refreshToken', authDto.tokens.refreshToken, {maxAge: 1 * 60 * 60 * 1000, httpOnly: true});
-    return res.send({id: authDto.id, login: authDto.login, accessToken: authDto.tokens.accessToken, avatar: authDto.avatar});
+    res.cookie(
+      'refreshToken', 
+      authDto.tokens.refreshToken, 
+      {
+        maxAge: 1 * 60 * 60 * 1000, 
+        httpOnly: true
+      }
+    );
+    return res.send({
+      id: authDto.id, 
+      login: authDto.login, 
+      accessToken: authDto.tokens.accessToken, 
+      avatar: authDto.avatar,
+      author: authDto.author,
+    });
   }
 
   @Post('/login')
@@ -25,7 +38,7 @@ export class AuthController {
   ) {
     const authDto = await this.authService.login(userDto);
     res.cookie('refreshToken', authDto.tokens.refreshToken, {maxAge: 1 * 60 * 60 * 1000, httpOnly: true});
-    return res.send({id: authDto.id, login: authDto.login, accessToken: authDto.tokens.accessToken, avatar: authDto.avatar});
+    return res.send({id: authDto.id, login: authDto.login, accessToken: authDto.tokens.accessToken, avatar: authDto.avatar, author: authDto.author});
   }
 
   @Post('/refresh')
@@ -35,7 +48,7 @@ export class AuthController {
     const refreshToken = req.cookies;
     console.log(refreshToken?.refreshToken);
     const authDto = await this.authService.refresh(refreshToken?.refreshToken);
-    return {id: authDto.id, login: authDto.login, accessToken: authDto.tokens.accessToken, avatar: authDto.avatar}
+    return {id: authDto.id, login: authDto.login, accessToken: authDto.tokens.accessToken, avatar: authDto.avatar, author: authDto.author}
   }
 
   @Post('/logout')

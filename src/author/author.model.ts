@@ -2,6 +2,7 @@ import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne
 import { AuthorType } from "./author-types.model";
 import { User } from "src/users/users.model";
 import { Author_Subs } from "./author-subs.model";
+import { Creation } from "src/creations/creations.model";
 
 interface AuthorCreationAttrs {
   name: string,
@@ -32,4 +33,7 @@ export class Author extends Model<Author, AuthorCreationAttrs> {
 
   @BelongsToMany(() => User, () => Author_Subs)
   subscribers: User[];
+
+  @HasMany(() => Creation)
+  creations: Creation[];
 }

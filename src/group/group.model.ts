@@ -21,7 +21,7 @@ export class Group extends Model<Group, GroupCreationAttrs> {
   name: string;
 
   @Column({type: DataType.STRING, allowNull: true})
-  avatar: string;
+  avatar: string | undefined;
 
   @HasMany(() => GroupMember)
   groupMembers: GroupMember[];

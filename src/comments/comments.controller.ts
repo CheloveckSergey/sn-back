@@ -30,7 +30,7 @@ export class CommentsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/createComment')
-  async createImageComment(
+  async createComment(
     @Body() dto: CrBody,
     @Req() req,
   ) {

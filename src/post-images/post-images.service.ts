@@ -7,6 +7,7 @@ import { writeFile } from 'fs/promises';
 import { CreationsService } from 'src/creations/creations.service';
 import { Comment } from 'src/comments/comments.model';
 import { CrTypeCodes } from 'src/creations/creation-types.model';
+import { Creation } from 'src/creations/creations.model';
 
 @Injectable()
 export class PostImagesService {
@@ -20,7 +21,10 @@ export class PostImagesService {
     const image = await this.postImageRep.findOne({
       where: {
         id,
-      }
+      },
+      include: [
+        Creation,
+      ]
     });
     return image;
   }
@@ -32,6 +36,7 @@ export class PostImagesService {
       },
       include: [
         Comment,
+        Creation
       ]
     });
     return images;

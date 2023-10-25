@@ -17,14 +17,14 @@ export class Creation extends Model<Creation, GroupCreationAttrs> {
   id: number;
 
   @ForeignKey(() => Author)
-  @Column({type: DataType.INTEGER, allowNull: false, unique: true})
+  @Column({type: DataType.INTEGER, allowNull: false, unique: false})
   authorId: number;
 
   @BelongsTo(() => Author)
   author: Author;
 
   @ForeignKey(() => CreationType)
-  @Column({type: DataType.INTEGER, allowNull: false})
+  @Column({type: DataType.INTEGER, allowNull: false, unique: false})
   typeId: number;
 
   @BelongsTo(() => CreationType)

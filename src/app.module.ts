@@ -43,7 +43,7 @@ import { UsersModule } from "./users/users.module";
       port: 3306,
       username: 'root',
       password: 'David_2102',
-      database: 'sn2',
+      database: 'sn3',
       models: [
         AlbumImage,
         Album,

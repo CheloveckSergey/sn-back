@@ -4,7 +4,7 @@ import { CreateGroupDto, DeleteGrouDto } from './dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('group')
+@Controller('groups')
 export class GroupController {
 
   constructor(private groupService: GroupService) {}

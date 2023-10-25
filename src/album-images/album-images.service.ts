@@ -6,6 +6,7 @@ import * as path from 'path';
 import { writeFile } from 'fs/promises';
 import { CreationsService } from 'src/creations/creations.service';
 import { CrTypeCodes } from 'src/creations/creation-types.model';
+import { Creation } from 'src/creations/creations.model';
 
 @Injectable()
 export class AlbumImagesService {
@@ -19,7 +20,10 @@ export class AlbumImagesService {
     const image = await this.imageRep.findOne({
       where: {
         id,
-      }
+      },
+      include: [
+        Creation,
+      ]
     });
     return image;
   }
@@ -28,7 +32,10 @@ export class AlbumImagesService {
     const images = await this.imageRep.findAll({
       where: {
         albumId,
-      }
+      },
+      include: [
+        Creation,
+      ]
     });
     return images;
   }
