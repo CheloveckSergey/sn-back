@@ -30,7 +30,7 @@ export class Creation extends Model<Creation, GroupCreationAttrs> {
   @BelongsTo(() => CreationType)
   type: CreationType;
 
-  @HasMany(() => Comment)
+  @HasMany(() => Comment, 'creationId')
   comments: Comment[];
 
   @HasMany(() => Like)

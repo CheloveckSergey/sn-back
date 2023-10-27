@@ -48,6 +48,13 @@ export class GroupController {
     return this.groupService.createGroup(dto.userId, dto.name, file);
   }
 
+  @Post('/deleteGroup')
+  async deleteGroup(
+    @Body() dto: {groupId: number}
+  ) {
+    return this.groupService.deleteGroup(dto.groupId);
+  }
+
   // @UseGuards(JwtAuthGuard)
   // @Post('/deleteGroupById')
   // async deleteGroupById(

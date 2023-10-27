@@ -30,21 +30,25 @@ export class AuthorController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/subscribe/:authorId')
+  @Post('/subscribe')
   async subscribe(
-    @Param('authorId') authorId: number,
-    @Req() req,
+    @Body() dto: {
+      authorId: number,
+      userId: number,
+    }
   ) {
-    return this.authorService.subscribe(req.userPayload.id, authorId);
+    return this.authorService.subscribe(dto.userId, dto.authorId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/unsubscribe/:authorId')
+  @Post('/unsubscribe')
   async unsubscribe(
-    @Param('authorId') authorId: number,
-    @Req() req,
+    @Body() dto: {
+      authorId: number,
+      userId: number,
+    }
   ) {
-    return this.authorService.unsubscribe(req.userPayload.id, authorId);
+    return this.authorService.unsubscribe(dto.userId, dto.authorId);
   }
 
   @Get('/getSubsByAuthorId/:authorId')

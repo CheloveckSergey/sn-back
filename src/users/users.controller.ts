@@ -57,13 +57,12 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/createFriendship/:userId')
+  @Post('/createFriendship')
   async createFriendship(
-    @Param('userId') userId: number,
+    @Body() dto: { userId1: number, userId2: number },
     @Req() req,
   ) {
-    console.log(userId);
-    return this.userService.createFriendship(req.userPayload.id, userId);
+    return this.userService.createFriendship(dto.userId1, dto.userId2);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -76,19 +75,21 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/getPossibleFriends')
+  @Get('/getPossibleFriends/:userId')
   async getPossibleFriends(
     @Req() req,
+    @Param('userId') userId: number,
   ) {
-    return this.userService.getPossibleFriends(req.userPayload.id);
+    return this.userService.getPossibleFriends(userId);
   }
   
   @UseGuards(JwtAuthGuard)
-  @Get('/getAllFriends')
+  @Get('/getAllFriends/:userId')
   async getAllFriends(
     @Req() req,
+    @Param('userId') userId: number,
   ) {
-    return this.userService.getFriendsByUserId(req.userPayload.id);
+    return this.userService.getFriendsByUserId(userId);
   }
 
   // @Get('/getAllSubsByAuthorId/:authorId')

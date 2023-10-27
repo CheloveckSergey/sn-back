@@ -29,6 +29,6 @@ export class Comment extends Model<Comment, CommentCreationAttrs> {
   @Column({type: DataType.INTEGER, allowNull: false})
   creationId: number;
 
-  @BelongsTo(() => Creation)
+  @BelongsTo(() => Creation, 'creationId')
   creation: Creation;
 }

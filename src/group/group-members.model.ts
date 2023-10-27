@@ -35,6 +35,6 @@ export class GroupMember extends Model<GMCreationAttrs> {
   @BelongsTo(() => User)
   group: Group;
 
-  @Column({type: DataType.INTEGER, allowNull: false})
+  @Column({type: DataType.STRING, allowNull: false})
   gmType: GMTypes;
 }

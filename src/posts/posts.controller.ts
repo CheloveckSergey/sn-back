@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts')
 export class PostsController {
@@ -20,16 +20,17 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/createPost')
-  @UseInterceptors(FileInterceptor('img'))
-  createPostUser(
+  @UseInterceptors(FilesInterceptor('img'))
+  createPost(
     @Body() { description, authorId }: { description: string, authorId: number },
     @Req() req,
-    // @UploadedFile() files: Express.Multer.File[]
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     console.log("CREATE_POST_CONTROLLER");
     console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId);
+    console.log(files);
     return this.postsService.createPostByAuthor(description, files, Number(authorId));
+    // return {message: 'Иди нахуй'};
   }
 
   // @UseGuards(JwtAuthGuard)

@@ -31,7 +31,10 @@ export class UsersService {
   async getAllUsers() {
     const users = await this.userRepository.findAll({
       include: [
-        Author,
+        {
+          model: Author,
+          as: 'author',
+        }
       ]
     });
     return users;
@@ -41,7 +44,10 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: {id},
       include: [
-        Author,
+        {
+          model: Author,
+          as: 'author',
+        },
       ]
     });
     return user;
@@ -242,7 +248,7 @@ export class UsersService {
     const allUsers = await this.getAllUsers();
     const friends = await this.getFriendsByUserId(userId)
     const possibleFriends = allUsers.filter(user => {
-      if (user.id === userId) return false;
+      if (user.id == userId) return false;
       for (let friend of friends) {
         if (friend.id === user.id) {
           return false;

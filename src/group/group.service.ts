@@ -104,6 +104,21 @@ export class GroupService {
     return {message: 'Группа создана'};
   }
 
+  async deleteGroup(groupId: number) {
+    const group = await this.getGroupById(groupId);
+    if (!group) {
+      throw new HttpException('Такой группы не существует ебать', HttpStatus.BAD_REQUEST);
+    }
+    await this.groupMembersRep.destroy({
+      where: {
+        groupId,
+      }
+    });
+    await group.destroy();
+    const author = await this.authorService.getAuthorById(group.authorId);
+    await author.destroy();
+  }
+
   // async createGroup(userId: number, name: string, imageFile: Express.Multer.File) {
   //   if (!name) {
   //     return {message: 'Нет названия группы'}
