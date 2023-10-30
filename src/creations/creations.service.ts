@@ -59,14 +59,14 @@ export class CreationsService {
     console.log('AUTHOR_ID: ' + authorId + ' ' + typeof authorId);
     console.log('TYPE_ID: ' + creationType.id + ' ' + typeof creationType.id);
     let creation: Creation;
-    try {
+    // try {
       creation = await this.creationRep.create({
         authorId,
         typeId: creationType.id,
       });
-    } catch (error) {
-      console.log(error);
-    }
+    // } catch (error) {
+    //   console.log(error);
+    // }
     return creation;
   }
 

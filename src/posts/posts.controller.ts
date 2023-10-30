@@ -26,8 +26,8 @@ export class PostsController {
     @Req() req,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    console.log("CREATE_POST_CONTROLLER");
-    console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId);
+    console.log("\n\nCREATE_POST_CONTROLLER");
+    console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId + '\n\n');
     console.log(files);
     return this.postsService.createPostByAuthor(description, files, Number(authorId));
     // return {message: 'Иди нахуй'};
