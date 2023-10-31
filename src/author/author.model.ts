@@ -4,6 +4,14 @@ import { User } from "src/users/users.model";
 import { Author_Subs } from "./author-subs.model";
 import { Creation } from "src/creations/creations.model";
 
+export interface AuthorWithSubscribed {
+  id: number,
+  name: string,
+  avatar: string | undefined,
+  type: AuthorType,
+  subscribed: boolean,
+}
+
 interface AuthorCreationAttrs {
   name: string,
   avatar?: string | undefined,

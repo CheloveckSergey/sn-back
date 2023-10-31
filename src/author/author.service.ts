@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Author } from './author.model';
 import { User } from 'src/users/users.model';
 import { AuthorType, AuthorTypeCodes, AuthorTypeNames } from './author-types.model';
+import { Op } from 'sequelize';
+import { Author_Subs } from './author-subs.model';
 
 export type _Author = {
   id: number,
@@ -24,6 +26,7 @@ export class AuthorService {
   constructor(
     @InjectModel(Author) private authorRep: typeof Author,
     @InjectModel(AuthorType) private authorTypeRep: typeof AuthorType,
+    @InjectModel(Author_Subs) private authorSubsRep: typeof Author_Subs,
   ) {}
 
   // async createAuthor(dto: CreateAuthorReq) {
@@ -138,6 +141,20 @@ export class AuthorService {
     });
     // console.log(subscribers);
     return subscribers;
+  }
+
+  async isSubscribed(userId: number, authorId: number): Promise<boolean> {
+    const authorSub = await this.authorSubsRep.findOne({
+      where: {
+        userId,
+        authorId,
+      }
+    });
+    if (authorSub) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async subscribe(userId: number, authorId: number) {

@@ -1,4 +1,5 @@
 import { Author } from "src/author/author.model";
+import { Roles } from "src/roles/roles.model";
 
 export interface AuthDto {
   id: number,
@@ -17,4 +18,10 @@ export interface RefreshDto {
   id: number,
   login: string,
   refreshToken: string,
+}
+
+export type Payload = {
+  id: number,
+  login: string,
+  roles: Roles[],
 }

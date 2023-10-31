@@ -1,8 +1,14 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { GroupMember } from "./group-members.model";
 // import { GroupDesc } from "./group-desc.model";
-import { Author } from "src/author/author.model";
+import { Author, AuthorWithSubscribed } from "src/author/author.model";
 
+export interface GroupWithSubscribed {
+  id: number,
+  name: string,
+  avatar: string | undefined,
+  author: AuthorWithSubscribed,
+} 
 
 interface GroupCreationAttrs {
   name: string,

@@ -1,22 +1,26 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Group } from './group.model';
+import { Group, GroupWithSubscribed } from './group.model';
 import { UsersService } from 'src/users/users.service';
 import { GroupDesc } from './group-desc.model';
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
 import { AuthorService, _Author } from 'src/author/author.service';
-import { AuthorTypeCodes } from 'src/author/author-types.model';
+import { AuthorType, AuthorTypeCodes } from 'src/author/author-types.model';
 import { GMTypes, GroupMember } from './group-members.model';
+import { Author } from 'src/author/author.model';
+import { User } from 'src/users/users.model';
 
-type _Group = {
-  id: number,
-  name: string,
-  avatar: string | undefined,
-  adminId: number,
-  author: _Author,
-}
+//Возвращает автора, с информацией, подписан ли на него текущий пользователь,
+//и массивом подписчиков, в котором есть текущий юзер, либо нет
+// interface AuthorWithSubscribed extends Author {
+//   subscribed: boolean;
+// }
+
+// interface GroupWithSubscribed extends Group {
+//   author: AuthorWithSubscribed;
+// }
 
 @Injectable()
 export class GroupService {
@@ -33,14 +37,33 @@ export class GroupService {
     return allGroups;
   }
 
+  // Это какой то пиздец, но, если данный юзер не подписан на автора,
+  // то автор просто не хочет подгружаться. Из-за этого приходится
+  // отдельно искать подписчика в авторе, делая дополнительный запрос.
   async getGroupById(id: number) {
     const group = await this.groupRepository.findOne({
       where: {
         id
       },
-      include: {
-        all: true
-      }
+      include: [
+        {
+          model: Author,
+          as: 'author',
+          include: [
+            {
+              model: AuthorType,
+              as: 'type',
+            },
+            // {
+            //   model: User,
+            //   as: 'subscribers',
+            //   // where: {
+            //   //   id: userId,
+            //   // }
+            // }
+          ]
+        }
+      ]
     });
     return group;
   }
@@ -54,34 +77,28 @@ export class GroupService {
     return group;
   }
 
-  // async getGroupByName(name: string, curUserId?: number) {
-  //   const group = await this.groupRepository.findOne({
-  //     where: {
-  //       name
-  //     },
-  //   });
-  //   const author = await this.authorService.getAuthorByGroupId(group.id, curUserId);
-  //   let _group: _Group = {
-  //     id: group.id,
-  //     name: group.name,
-  //     avatar: group.avatar,
-  //     adminId: group.adminId,
-  //     author: author,
-  //   };
-  //   return _group;
-  // }
+  async getGroupWSFromGroup(group: Group, userId: number) {
+    const isSubscribed = await this.authorService.isSubscribed(userId, group.author.id);
+    const groupWithSubscribed: GroupWithSubscribed = {
+      id: group.id,
+      name: group.name,
+      avatar: group.avatar,
+      author: {
+        id: group.author.id,
+        name: group.author.name,
+        avatar: group.author.avatar,
+        type: group.author.type,
+        subscribed: isSubscribed ? true : false,
+      }
+    }
+    return groupWithSubscribed;
+  }
 
-  // async getAdminGroupsByUserId(userId: number) {
-  //   const groups = await this.groupRepository.findAll({
-  //     where: {
-  //       adminId: userId,
-  //     },
-  //     include: {
-  //       all: true
-  //     }
-  //   });
-  //   return groups;
-  // }
+  async getGroupWS(groupId: number, userId: number) {
+    const group = await this.getGroupById(groupId);
+    const groupWithSubscribed = this.getGroupWSFromGroup(group, userId)
+    return groupWithSubscribed;
+  }
 
   async createGroup(userId: number, name: string, avatarFile: Express.Multer.File) {
     const candidate = await this.getGroupByName(name);
@@ -118,60 +135,6 @@ export class GroupService {
     const author = await this.authorService.getAuthorById(group.authorId);
     await author.destroy();
   }
-
-  // async createGroup(userId: number, name: string, imageFile: Express.Multer.File) {
-  //   if (!name) {
-  //     return {message: 'Нет названия группы'}
-  //   }
-  //   const allGroups = await this.getAllGroups();
-  //   const candidate = allGroups.find(group => group.name === name);
-  //   if (candidate) {
-  //     throw new HttpException('Такая группа уже существует', HttpStatus.BAD_REQUEST);
-  //   }
-  //   let imageName;
-  //   if (imageFile) {
-  //     imageName = uuid.v4() + '.jpg';
-  //     await writeFile(path.resolve('src', 'static', imageName), imageFile.buffer);
-  //   } else {
-  //     imageName = null;
-  //   }
-  //   const group = await this.groupRepository.create({adminId: userId, name, avatar: imageName});
-  //   const description = await this.groupDescRepository.create({groupId: group.id});
-  //   const author = await this.authorService.createAuthor({name: group.name, authorType: 'group', authorId: group.id});
-  //   await this.authorService.updateAvatar(imageName, author.id);
-  //   return group;
-  // }
-
-  // async deleteGroupById(id: number, userId: number) {
-  //   const group = await this.getGroupById(id);
-  //   if (group.adminId !== userId) {
-  //     throw new HttpException('У вас нет прав нахуй!', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const response = await this.groupRepository.destroy({
-  //     where: {
-  //       id
-  //     }
-  //   });
-  //   return response;
-  // }
-
-  // async getAllSubsByGroupId(groupId: number) {
-  //   const group = await this.groupRepository.findOne({
-  //     where: {
-  //       id: groupId,
-  //     },
-  //     include: {
-  //       all: true,
-  //     }
-  //   });
-  //   return group.subscribers;
-  // }
-
-  // async getSubsByGroupId(groupId: number) {
-  //   const author = await this.authorService.getAuthorByGroupId(groupId);
-  //   const subs = await this.authorService.getSubscribersByAuthorId(author.id);
-  //   return subs;
-  // }
 
   async createAvatar(userId: number, name: string, file: Express.Multer.File) {
     const avatarName = uuid.v4() + '.jpg';

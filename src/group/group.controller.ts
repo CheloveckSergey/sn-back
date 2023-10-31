@@ -3,6 +3,7 @@ import { GroupService } from './group.service';
 import { CreateGroupDto, DeleteGrouDto } from './dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Payload } from 'src/auth/dto/auth.dto';
 
 @Controller('groups')
 export class GroupController {
@@ -23,11 +24,15 @@ export class GroupController {
   //   return this.groupService.getGroupByName(name, req.userPayload.id);
   // }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getGroupById/:id')
   async getGroupById(
-    @Param('id') id: number
+    @Param('id') id: number,
+    @Req() req: {
+      userPayload: Payload,
+    }
   ) {
-    return this.groupService.getGroupById(id);
+    return this.groupService.getGroupWS(id, req.userPayload.id);
   }
 
   // @Get('/getAdminGroupsByUserId/:id')
