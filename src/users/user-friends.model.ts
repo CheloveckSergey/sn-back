@@ -13,11 +13,9 @@ export class User_Friend extends Model<User_Friend, User_FriendAttrs> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false, unique: false})
+  @Column({type: DataType.INTEGER, allowNull: false})
   userId1: number;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false, unique: false})
+  @Column({type: DataType.INTEGER, allowNull: false})
   userId2: number;
 }

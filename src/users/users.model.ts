@@ -54,8 +54,8 @@ export class User extends Model<User, UserCreationAttrs> {
   @BelongsToMany(() => Author, () => Author_Subs)
   subAuthors: Author[];
 
-  @BelongsToMany(() => User, () => User_Friend)
-  friends: User[];
+  // @BelongsToMany(() => User, () => User_Friend)
+  // friends: User[];
 
   @HasOne(() => UserDesc)
   userDesc: UserDesc;
