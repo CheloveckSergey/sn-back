@@ -29,18 +29,6 @@ export class AuthorService {
     @InjectModel(Author_Subs) private authorSubsRep: typeof Author_Subs,
   ) {}
 
-  // async createAuthor(dto: CreateAuthorReq) {
-  //   let response: Author;
-  //   if (dto.authorType === 'group') {
-  //     response = await this.authorRep.create({name: dto.name, avatar: dto.avatar, authorType: dto.authorType, groupId: dto.authorId});
-  //   } else if (dto.authorType === 'user') {
-  //     response = await this.authorRep.create({name: dto.name, avatar: dto.avatar, authorType: dto.authorType, userId: dto.authorId});
-  //   } else {
-  //     throw new HttpException('Странный тип автора...', HttpStatus.BAD_REQUEST);
-  //   }
-  //   return response
-  // }
-
   async getAuthorById(id: number) {
     const author = await this.authorRep.findOne({
       where: {
@@ -49,15 +37,6 @@ export class AuthorService {
     });
     return author;
   }
-
-  // async getAuthorByName(name: string) {
-  //   const author = await this.authorRep.findOne({
-  //     where: {
-  //       name
-  //     },
-  //   });
-  //   return author;
-  // }
 
   async createAuthor(name: string, typeCode: AuthorTypeCodes, avatar?: string | undefined) {
     const authorType = await this.authorTypeRep.findOne({
@@ -73,37 +52,6 @@ export class AuthorService {
     return author;
   }
 
-  // async getAuthorByUserId(id: number, curUserId?: number) {
-  //   const author = await this.authorRep.findOne({
-  //     where: {
-  //       userId: id,
-  //     }
-  //   });
-  //   return author;
-  // }
-
-  // async getAuthorByGroupId(id: number, curUserId?: number): Promise<_Author> {
-  //   const author = await this.authorRep.findOne({
-  //     where: {
-  //       groupId: id,
-  //     }
-  //   });
-  //   const subscribers = await this.getSubscribersByAuthorId(author.id);
-  //   // console.log(subscribers);
-  //   console.log(curUserId);
-  //   let _author: _Author = {
-  //     id: author.id,
-  //     name: author.name,
-  //     avatar: author.avatar,
-  //     authorType: author.authorType,
-  //     subscribedFor: false,
-  //   };
-  //   if (subscribers.find(sub => sub.id === curUserId)) {
-  //     _author.subscribedFor = true;
-  //   }
-  //   return _author;
-  // }
-
   async deleteAuthorById(id: number) {
     const response = await this.authorRep.destroy({
       where: {
@@ -112,15 +60,6 @@ export class AuthorService {
     });
     return response;
   }
-
-  // async deleteAuthorByName(name: string) {
-  //   const response = await this.authorRep.destroy({
-  //     where: {
-  //       name
-  //     }
-  //   });
-  //   return response;
-  // }
 
   async getSubscribersByAuthorId(authorId: number) {
     const author = await this.authorRep.findOne({
@@ -188,14 +127,6 @@ export class AuthorService {
     author.$remove('subscribers', [userId]);
     return {message: 'Ну вроде отписался'};
   }
-
-  // // async getAllSubGrAuthor(userId) {
-  // //   const authors = await this.authorRep.findAll({
-  // //     where: {
-  // //       subscribers: use
-  // //     }
-  // //   })
-  // // }
 
   async updateAvatar(fileName: string, authorId: number) {
     const response = await this.authorRep.update(

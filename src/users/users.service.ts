@@ -9,13 +9,14 @@ import * as path from "path";
 import { AuthorService } from 'src/author/author.service';
 import { User_Friend } from './user-friends.model';
 import { AuthorTypeCodes } from 'src/author/author-types.model';
-import { Author } from 'src/author/author.model';
+import { Author, AuthorWithSubscribed } from 'src/author/author.model';
 
 type OneUser = {
   id: number,
   login: string,
   avatar: string,
   isFriend: boolean,
+  author: AuthorWithSubscribed,
 }
 
 @Injectable()
@@ -51,38 +52,6 @@ export class UsersService {
       ]
     });
     return user;
-    // let _user: OneUser;
-    // if (!curUserId) {
-    //   _user = {
-    //     id: user.id,
-    //     login: user.login,
-    //     avatar: user.avatar,
-    //     isFriend: false,
-    //   };
-    //   return _user;
-    // }
-    // const user_friend = await this.user_FriendRep.findOne({
-    //   where: {
-    //     userId1: id,
-    //     userId2: curUserId,
-    //   }
-    // })
-    // if (user_friend) {
-    //   _user = {
-    //     id: user.id,
-    //     login: user.login,
-    //     avatar: user.avatar,
-    //     isFriend: true,
-    //   }
-    // } else {
-    //   _user = {
-    //     id: user.id,
-    //     login: user.login,
-    //     avatar: user.avatar,
-    //     isFriend: false,
-    //   }
-    // }
-    // return _user;
   }
 
   async getUserByLogin(login: string) {
@@ -96,14 +65,6 @@ export class UsersService {
     });
     return user;
   }
-
-  // async getAvatarById(id: number) {
-  //   const avatar = await this.userRepository.findOne({
-  //     where: {id},
-  //     attributes: ['avatar'],
-  //   });
-  //   return avatar;
-  // }
 
   async createUser(dto: CreateUserDto) {
     const author = await this.authorService.createAuthor(dto.login, AuthorTypeCodes.USER);
@@ -134,7 +95,7 @@ export class UsersService {
   }
 
   async createFriendship(userId1: number, userId2: number) {
-    console.log(userId1 + ':' + userId2);
+    console.log('\n\nСОЗДАНИЕ ДРУЖБЫ ТАК СКАЗАЦ');
     const friends = await this.getFriendsByUserId(userId1);
     if (friends.find(friend => friend.id === userId2)) {
       throw new HttpException("Такие пользователи уже дружат, если ты понимаешь о чём я ;)", HttpStatus.BAD_REQUEST);
@@ -176,14 +137,14 @@ export class UsersService {
     return {message: 'Ну вроде подружился'};
   }
 
-  async getFriendsByUserId(userId: number) {
+  async getFriendsByUserId(userId: number): Promise<OneUser[]> {
     const users_friends = await this.user_FriendRep.findAll({
       where: {
         userId1: userId,
       }
     });
     const allUsers = await this.getAllUsers();
-    const friends = allUsers.filter((user) => {
+    const _friends = allUsers.filter((user) => {
       for (let user_friend of users_friends) {
         if (user_friend.userId2 === user.id) {
           return true;
@@ -191,6 +152,22 @@ export class UsersService {
       }
       return false;
     });
+    const friends: OneUser[] = await Promise.all(_friends.map(async (_friend) => {
+      const subscribed = await this.authorService.isSubscribed(userId, _friend.author.id);
+      return {
+        id: _friend.id,
+        login: _friend.login,
+        avatar: _friend.avatar,
+        isFriend: true,
+        author: {
+          id: _friend.author.id,
+          name: _friend.author.name,
+          avatar: _friend.author.avatar,
+          type: _friend.author.type,
+          subscribed
+        }
+      }
+    }));
     return friends;
     // const user = await this.userRepository.findOne({
     //   where: {
@@ -260,16 +237,6 @@ export class UsersService {
     // return allUsers;
   }
 
-  // async getAllSubGroups(userId: number) {
-  //   const user = await this.userRepository.findOne({
-  //     where: {
-  //       id: userId,
-  //     },
-  //     include: [Author]
-  //   });
-  //   return user.subAuthors;
-  // }
-
   async getAllSubAuthorsByUserId(userId: number) {
     const user = await this.userRepository.findOne({
       where: {
@@ -282,17 +249,4 @@ export class UsersService {
     console.log(user.subAuthors);
     return user.subAuthors;
   }
-
-  // async getAllSubsByAuthorId(authorId: number) {
-  //   const author = await this.authorService.getAuthorById(authorId);
-  //   const subs = await this.userRepository.findAll({
-  //     where: {
-  //       subAuthors: [author],
-  //     },
-  //     include: {
-  //       all: true,
-  //     }
-  //   });
-  //   return subs;
-  // }
 }
