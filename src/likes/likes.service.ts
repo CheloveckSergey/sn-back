@@ -58,4 +58,21 @@ export class LikesService {
     candidate.destroy();
     return {message: 'Ну вроде удалено, так сказац'};
   }
+
+  async isLiked(userId: number, creationId: number): Promise<boolean> {
+    const like = await this.likeRep.findOne({
+      where: {
+        userId,
+        creationId,
+      }
+    });
+    console.log('\n\n');
+    console.log(like);
+    console.log('\n\n');
+    if (like) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

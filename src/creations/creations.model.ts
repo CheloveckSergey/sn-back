@@ -1,8 +1,21 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
-import { Author } from "src/author/author.model";
+import { Author, AuthorWithSubscribed, OneAuthor } from "src/author/author.model";
 import { CreationType } from "./creation-types.model";
 import { Comment } from "src/comments/comments.model";
 import { Like } from "src/likes/likes.model";
+
+export interface OneCreation {
+  id: number,
+  authorId: number,
+  author: OneAuthor,
+  typeId: number,
+  type: CreationType,
+  commentNumber: number,
+  likeNumber: number,
+  isLiked: boolean,
+  createdAt: string,
+  updatedAt: string,
+}
 
 interface GroupCreationAttrs {
   authorId: number,

@@ -1,6 +1,15 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Album } from "src/albums/albums.model";
-import { Creation } from "src/creations/creations.model";
+import { Creation, OneCreation } from "src/creations/creations.model";
+
+export interface OneAlbumImage {
+  id: number,
+  value: string,
+  creationId: number,
+  creation: OneCreation,
+  albumId: number,
+  album: Album,
+}
 
 interface AICreationAttrs {
   value: string,

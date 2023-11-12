@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { PostImage } from './post-images.model';
+import { OnePostImage, PostImage } from './post-images.model';
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
@@ -27,6 +27,18 @@ export class PostImagesService {
       ]
     });
     return image;
+  }
+
+  async getOnePostImage(userId: number, postImage: PostImage) {
+    const oneCreation = await this.creationsService.getOneCreationByCreation(userId, postImage.creation);
+    const onePostImage: OnePostImage = {
+      id: postImage.id,
+      value: postImage.value,
+      postId: postImage.postId,
+      creationId: postImage.creationId,
+      creation: oneCreation,
+    }
+    return onePostImage;
   }
 
   async getAllImagesByPostId(postId: number) {

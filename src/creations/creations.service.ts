@@ -1,8 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Creation } from './creations.model';
+import { Creation, OneCreation } from './creations.model';
 import { CrTypeCodes, CrTypesNames, CreationType } from './creation-types.model';
 import { Op } from 'sequelize';
+import { AuthorService } from 'src/author/author.service';
+import { LikesService } from 'src/likes/likes.service';
 
 @Injectable()
 export class CreationsService {
@@ -10,6 +12,8 @@ export class CreationsService {
   constructor(
     @InjectModel(Creation) private creationRep: typeof Creation,
     @InjectModel(CreationType) private creationTypeRep: typeof CreationType,
+    private authorSerivce: AuthorService,
+    private likesSerivce: LikesService,
   ) {}
 
   async getCreationById(id: number) {
@@ -51,6 +55,24 @@ export class CreationsService {
       }
     });
     return creations;
+  }
+
+  async getOneCreationByCreation(userId: number, creation: Creation): Promise<OneCreation> {
+    const oneAuthor = await this.authorSerivce.getOneAuthorByAuthor(userId, creation.author);
+    const isLiked = await this.likesSerivce.isLiked(userId, creation.id);
+    const oneCreation: OneCreation = {
+      id: creation.id,
+      authorId: creation.authorId,
+      author: oneAuthor,
+      typeId: creation.typeId,
+      type: creation.type,
+      commentNumber: creation.comments.length,
+      likeNumber: creation.likes.length,
+      isLiked,
+      createdAt: creation.createdAt,
+      updatedAt: creation.updatedAt,
+    }
+    return oneCreation;
   }
 
   async createCreation(authorId: number, crTypeCode: CrTypeCodes) {

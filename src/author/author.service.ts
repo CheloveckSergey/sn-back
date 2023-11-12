@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Author } from './author.model';
+import { Author, OneAuthor } from './author.model';
 import { User } from 'src/users/users.model';
 import { AuthorType, AuthorTypeCodes, AuthorTypeNames } from './author-types.model';
 import { Op } from 'sequelize';
@@ -36,6 +36,18 @@ export class AuthorService {
       },
     });
     return author;
+  }
+
+  async getOneAuthorByAuthor(userId: number, author: Author): Promise<OneAuthor> {
+    const isSubscribed = await this.isSubscribed(userId, author.id);
+    const oneAuthor: OneAuthor = {
+      id: author.id,
+      name: author.name,
+      avatar: author.avatar,
+      type: author.type,
+      subscribed: isSubscribed,
+    }
+    return oneAuthor;
   }
 
   async createAuthor(name: string, typeCode: AuthorTypeCodes, avatar?: string | undefined) {

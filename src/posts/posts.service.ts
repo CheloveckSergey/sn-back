@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Post } from './posts.model';
+import { OnePost, Post } from './posts.model';
 import { Op } from 'sequelize';
 import { CreationsService } from 'src/creations/creations.service';
 import { PostImagesService } from 'src/post-images/post-images.service';
 import { CrTypeCodes } from 'src/creations/creation-types.model';
-import { PostImage } from 'src/post-images/post-images.model';
+import { OnePostImage, PostImage } from 'src/post-images/post-images.model';
 import { Creation } from 'src/creations/creations.model';
 import { Like } from 'src/likes/likes.model';
 import { Comment } from 'src/comments/comments.model';
@@ -19,36 +19,6 @@ export class PostsService {
     private creationsService: CreationsService,
     private postImagesService: PostImagesService,
   ) {}
-
-  // async createPostByUser(description: string, imageFile: Express.Multer.File, userId: number) {
-  //   const author = await this.authorService.getAuthorByUserId(userId);
-  //   const response = await this.createPost(description, imageFile, author.id);
-  //   return response;
-  // }
-
-  // async createPostByGroup(description: string, imageFile: Express.Multer.File, groupName: string, userId: number) {
-  //   console.log(groupName);
-  //   const group = await this.groupService.getGroupByName(groupName);
-  //   const response = await this.createPost(description, imageFile, group.author.id);
-  //   return response;
-  // }
-
-  // async createPost(description: string, imageFile: Express.Multer.File, authorId: number) {
-  //   if (!description && !imageFile) {
-  //     return {message: 'Нельзя создать пост из нихуя'}
-  //   }
-  //   let imageName;
-  //   if (imageFile) {
-  //     imageName = uuid.v4() + '.jpg';
-  //     await writeFile(path.resolve('src', 'static', imageName), imageFile.buffer);
-  //   } else {
-  //     imageName = null;
-  //   }
-  //   await this.postRepository.create(
-  //     {description, image: imageName, authorId},
-  //   );
-  //   return {message: 'Пост успешно создан'}
-  // }
 
   async getAllPostsByAuthors(authorIds: number[]) {
     const postCreations = await this.creationsService.getTCreationsByAuthorIds(CrTypeCodes.POST, authorIds);
@@ -162,6 +132,26 @@ export class PostsService {
     return posts;
   }
 
+  async getOnePostByPost(userId: number, post: Post): Promise<OnePost> {
+    const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
+    const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => 
+      this.postImagesService.getOnePostImage(userId, postImage)));
+    const onePost: OnePost = {
+      id: post.id,
+      description: post.description,
+      creationId: post.creationId,
+      creation: oneCreation,
+      postImages: onePostImages,
+    }
+    return onePost;
+  }
+
+  async getAllOnePostsByAuthorId(userId: number, authorId: number): Promise<OnePost[]> {
+    const allPosts = await this.getAllPostsByAuthorId(authorId);
+    const allOnePosts = await Promise.all(allPosts.map(post => this.getOnePostByPost(userId, post)));
+    return allOnePosts;
+  }
+
   async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number) {
     console.log("CREATE_POST_BY_AUTHOR");
     console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId);
@@ -183,65 +173,4 @@ export class PostsService {
     await post.destroy();
     return {message: 'Пост успешно удалён. Это успех, я считаю'};
   }
-
-  // async getAllPostsByUserId(userId: number) {
-  //   const author = await this.authorService.getAuthorByUserId(userId);
-  //   const posts = await this.getAllPostsByAuthorId(author.id);
-  //   return posts;
-  // }
-
-  // async getAllPostsByGroupId(groupId: number) {
-  //   const group = await this.groupService.getGroupById(groupId);
-  //   const author = await this.authorService.getAuthorById(group.authorId);
-  //   const posts = await this.getAllPostsByAuthorId(author.id);
-  //   const _posts = posts.map(post => {
-  //     return {
-  //       author: {
-  //         name: group.name,
-  //         avatar: group.avatar,
-  //         type: author.type,
-  //       },
-  //       creation: {
-  //         comments: post.creation.comments,
-  //         likes: post.creation.likes,
-  //       },
-  //       description: post.description,
-  //       images: post.postImages,
-  //     }
-  //   })
-  //   return _posts;
-  // }
-
-  // async getAllPostsByGroupName(groupName: string) {
-  //   const group = await this.groupService.getGroupByName(groupName);
-  //   const posts = await this.getAllPostsByAuthorId(group.author.id);
-  //   return posts;
-  // }
-
-  // async getFeedByUserId(userId: number) {
-  //   // const friends = await this.userService.getFriendsByUserId(userId);
-  //   // const friendAuthors = friends.map(async (friend) => await this.authorService.getAuthorByUserId(friend.id));
-  //   // const groups = await
-
-  //   const authors = await this.userService.getAllSubAuthorsByUserId(userId);
-  //   // console.log('AUTHORS');
-  //   // authors.forEach(author => console.log(author.id));
-  //   if (authors.length === 0) {
-  //     return [];
-  //   }
-  //   const posts = await this.postRepository.findAll({
-  //     where: {
-  //       authorId: {
-  //         [Op.or]: authors.map(author => author.id),
-  //       }
-  //     },
-  //     include: {
-  //       all: true,
-  //     },
-  //     order: sequelize.col('createdAt'),
-  //   });
-  //   // console.log('POSTS');
-  //   // posts.forEach(post => console.log(post.id));
-  //   return posts;
-  // }
 }

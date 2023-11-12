@@ -12,6 +12,14 @@ export interface AuthorWithSubscribed {
   subscribed: boolean,
 }
 
+export interface OneAuthor {
+  id: number,
+  name: string,
+  avatar: string | undefined,
+  type: AuthorType,
+  subscribed: boolean,
+}
+
 interface AuthorCreationAttrs {
   name: string,
   avatar?: string | undefined,

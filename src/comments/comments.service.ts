@@ -72,43 +72,11 @@ export class CommentsService {
     return {message: 'Коммент успешно удалён'}
   }
 
-  // async updateComment(userId: number, commentId: number, text: string) {
-  //   const comment = await this.getCommentById(commentId);
-  //   if (comment.userId !== userId) {
-  //     throw new HttpException('А тебе нельзя так делать!', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const newComment = await this.commentRepository.update({
-  //     text
-  //   }, {
+  // async isCommented(userId: number, creationId: number) {
+  //   const comment = await this.commentRepository.findOne({
   //     where: {
-  //       id: commentId,
+  //       user
   //     }
-  //   });
-  //   return newComment;
-  // }
-
-
-  // async getCommentsByImageId(imageId: number) {
-  //   const comments = await this.commentRepository.findAll({
-  //     where: {
-  //       imageId,
-  //     },
-  //     include: {
-  //       all: true,
-  //     }
-  //   });
-  //   return comments;
-  // }
-
-  // async getCommentsByPostId(postId: number) {
-  //   const comments = await this.commentRepository.findAll({
-  //     where: {
-  //       postId,
-  //     },
-  //     include: {
-  //       all: true,
-  //     }
-  //   });
-  //   return comments;
+  //   })
   // }
 }

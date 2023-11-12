@@ -28,6 +28,18 @@ export class AlbumImagesService {
     return image;
   }
 
+  // async getOneImageByImage(userId: number, albumImage: AlbumImage) {
+  //   const oneCreation = await this.creationsService.getOneCreationByCreation(userId, albumImage.creation);
+  //   const onePostImage: OnePostImage = {
+  //     id: postImage.id,
+  //     value: postImage.value,
+  //     postId: postImage.postId,
+  //     creationId: postImage.creationId,
+  //     creation: oneCreation,
+  //   }
+  //   return onePostImage;
+  // }
+
   async getAllImagesByAlbumId(albumId: number) {
     const images = await this.imageRep.findAll({
       where: {

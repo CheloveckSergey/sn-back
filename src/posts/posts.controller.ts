@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Req, UploadedFile, UploadedFiles, U
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Payload } from 'src/auth/dto/auth.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -11,6 +12,15 @@ export class PostsController {
   @Get('/getAllPostByAuthorId/:id')
   getAllPostByUserId(@Param('id') authorId: number) {
     return this.postsService.getAllPostsByAuthorId(authorId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getAllOnePostsByAuthorId/:id')
+  getAllOnePostsByAuthorId(
+    @Param('id') authorId: number,
+    @Req() req: {userPayload: Payload},
+  ) {
+    return this.postsService.getAllOnePostsByAuthorId(req.userPayload.id, authorId);
   }
 
   // @Get('/getFeedByUserId/:id')
