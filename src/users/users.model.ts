@@ -8,6 +8,7 @@ import { Author_Subs } from "src/author/author-subs.model";
 import { GroupMember } from "src/group/group-members.model";
 import { User_Friend } from "./user-friends.model";
 import { UserDesc } from "src/user-desc/user-desc.model";
+import { Message } from "src/messages/messages.model";
 
 interface UserCreationAttrs {
   login: string,
@@ -59,4 +60,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @HasOne(() => UserDesc)
   userDesc: UserDesc;
+
+  @HasMany(() => Message)
+  messages: Message[];
 }

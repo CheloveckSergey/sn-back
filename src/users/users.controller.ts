@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
+import { Payload } from 'src/auth/dto/auth.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,6 +37,15 @@ export class UsersController {
     @Req() req,
   ) {
     return this.userService.getUserById(id, req.userPayload.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getOneUserById/:id')
+  getOneUserById(
+    @Param('id') id: number,
+    @Req() req: { userPayload: Payload },
+  ) {
+    return this.userService.getOneUserById(id, req.userPayload.id);
   }
 
   // @Get('/avatar/:id')

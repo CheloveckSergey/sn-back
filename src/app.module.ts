@@ -34,6 +34,12 @@ import { UserDescModule } from "./user-desc/user-desc.module";
 import { User_Friend } from "./users/user-friends.model";
 import { User } from "./users/users.model";
 import { UsersModule } from "./users/users.module";
+import { MessagesModule } from './messages/messages.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { Message } from "./messages/messages.model";
+import { Room } from "./rooms/rooms.model";
+import { RoomMember } from "./rooms/room-members.model";
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -66,6 +72,9 @@ import { UsersModule } from "./users/users.module";
         UserDesc,
         User_Friend,
         User,
+        Message,
+        Room,
+        RoomMember,
       ],
       autoLoadModels: true,
     }),
@@ -82,6 +91,9 @@ import { UsersModule } from "./users/users.module";
     RolesModule,
     UserDescModule,
     UsersModule,
+    MessagesModule,
+    RoomsModule,
+    GatewayModule,
   ]
 })
 export class AppModule {}

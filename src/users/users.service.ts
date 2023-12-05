@@ -54,6 +54,28 @@ export class UsersService {
     return user;
   }
 
+  async getOneUserById(id: number, curUserId: number): Promise<OneUser> {
+    const user = await this.userRepository.findOne({
+      where: {id},
+      include: [
+        {
+          model: Author,
+          as: 'author',
+        },
+      ]
+    });
+    const isFriend = await this.isFriend(id, curUserId);
+    const authorWithSubscribed: AuthorWithSubscribed = await this.authorService.getOneAuthorByAuthor(curUserId, user.author);
+    const oneUser: OneUser = {
+      id: user.id,
+      login: user.login,
+      avatar: user.avatar,
+      isFriend,
+      author: authorWithSubscribed,
+    }
+    return oneUser;
+  }
+
   async getUserByLogin(login: string) {
     const user = await this.userRepository.findOne({
       where: {
@@ -235,6 +257,16 @@ export class UsersService {
     });
     return possibleFriends;
     // return allUsers;
+  }
+
+  async isFriend(userId: number, curUserId: number): Promise<boolean> {
+    const userFriend = await this.user_FriendRep.findOne({
+      where: {
+        userId1: userId,
+        userId2: curUserId,
+      }
+    });
+    return userFriend ? true : false;
   }
 
   async getAllSubAuthorsByUserId(userId: number) {

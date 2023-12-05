@@ -66,9 +66,6 @@ export class LikesService {
         creationId,
       }
     });
-    console.log('\n\n');
-    console.log(like);
-    console.log('\n\n');
     if (like) {
       return true;
     } else {
