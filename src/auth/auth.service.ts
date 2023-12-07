@@ -106,7 +106,7 @@ export class AuthService {
       roles: user.roles,
     }
     const accessToken = jwt.sign(payload, 'accessKey', {expiresIn: '30m'});
-    const refreshToken = jwt.sign(payload, 'refreshKey', {expiresIn: '2h'});
+    const refreshToken = jwt.sign(payload, 'refreshKey', {expiresIn: '12h'});
     return {accessToken, refreshToken}; 
   }
 

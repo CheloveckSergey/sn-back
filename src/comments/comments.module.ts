@@ -14,5 +14,8 @@ import { CreationsModule } from 'src/creations/creations.module';
     ]),
     CreationsModule,
   ],
+  exports: [
+    CommentsService,
+  ]
 })
 export class CommentsModule {}

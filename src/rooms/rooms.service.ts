@@ -83,8 +83,6 @@ export class RoomsService {
   }
 
   async getAllRoomsByUserId(id: number) {
-    console.log("GET_ALL_ROOMS_BY_USER_ID");
-    console.log("USER_ID: " + id);
     const roomMembers = await this.roomMemberRep.findAll({
       where: {
         userId: id,
@@ -93,8 +91,6 @@ export class RoomsService {
     if (!roomMembers?.length) {
       return [];
     }
-    console.log("ROOM_MEMBERS: ");
-    console.log(roomMembers);
     const rooms = await this.roomRep.findAll({
       where: {
         id: {
@@ -156,9 +152,10 @@ export class RoomsService {
   }
 
   async createPRoomAndWMessage(userId1: number, userId2: number, text: string) {
-    const room = await this.createPersonalRoom(userId1, userId2);
+    const _room = await this.createPersonalRoom(userId1, userId2);
+    const room = await this.getRoomById(_room.id);
     const message = await this.messagesService.createMessage(userId1, room.id, text);
-    return message;
+    return room;
   }
 
   async addRoomMember(userId: number, roomId: number) {
