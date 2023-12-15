@@ -40,6 +40,7 @@ import { Message } from "./messages/messages.model";
 import { Room } from "./rooms/rooms.model";
 import { RoomMember } from "./rooms/room-members.model";
 import { GatewayModule } from './gateway/gateway.module';
+import { ServiceModule } from './service/service.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { GatewayModule } from './gateway/gateway.module';
     MessagesModule,
     RoomsModule,
     GatewayModule,
+    ServiceModule,
   ]
 })
 export class AppModule {}

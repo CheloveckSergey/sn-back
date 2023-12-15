@@ -6,6 +6,7 @@ export type RoomType = 'personal' | 'general';
 
 interface RoomCreationAttrs {
   name?: string,
+  avatar?: string,
   type: RoomType,
 }
 @Table({

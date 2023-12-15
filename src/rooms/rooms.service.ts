@@ -7,6 +7,11 @@ import { Op } from 'sequelize';
 import { Message } from 'src/messages/messages.model';
 import { MessagesService } from 'src/messages/messages.service';
 import { User } from 'src/users/users.model';
+import * as uuid from 'uuid';
+import * as path from 'path';
+import { writeFile } from 'fs/promises';
+import { UsersService } from 'src/users/users.service';
+import { ImageService, MyImage } from 'src/service/image.service';
 
 @Injectable()
 export class RoomsService {
@@ -15,6 +20,8 @@ export class RoomsService {
     @InjectModel(Room) private roomRep: typeof Room,
     @InjectModel(RoomMember) private roomMemberRep: typeof RoomMember,
     private messagesService: MessagesService,
+    private usersService: UsersService,
+    private imageService: ImageService,
   ) {}
 
   async getRoomById(id: number) {
@@ -117,15 +124,61 @@ export class RoomsService {
     return rooms;
   }
 
-  async createRoom(userId: number, type: RoomType) {
-    const room = await this.roomRep.create({
-      type
+  async getAllMembersByRoom(roomId: number) {
+    const roomMembers = await this.roomMemberRep.findAll({
+      where: {
+        roomId,
+      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+        }
+      ]
     });
+    return roomMembers;
+  }
+
+  async getAllPossibleMembers(roomId: number, userId: number) {
+    const friends = await this.usersService.getFriendsByUserId(userId);
+    const roomMembers = await this.getAllMembersByRoom(roomId);
+    const possibleMembers = friends.filter(friend => {
+      for (let roomMember of roomMembers) {
+        if (roomMember.userId === friend.id) {
+          return false;
+        }
+      }
+      return true;
+    });
+    return possibleMembers;
+  }
+
+  async createRoom(userId: number, type: RoomType, name?: string, avatar?: Express.Multer.File) {
+    // let imageName: string | undefined = undefined;
+    let image: MyImage | undefined;
+    if (avatar) {
+      image = this.imageService.createMyImage(avatar);
+    }
+    const room = await this.roomRep.create({
+      type,
+      name,
+      avatar: image?.name,
+    });
+    image?.save();
     const roomMember = await this.roomMemberRep.create({
       userId: userId,
       roomId: room.id,
       type: 'admin',
     });
+    return room;
+  }
+
+  async createGeneralRoom(adminId: number, name: string, userIds: number[], avatar?: Express.Multer.File) {
+    const _room = await this.createRoom(adminId, 'general', name, avatar);
+    userIds.forEach(async (userId) => {
+      await this.addRoomMember(userId, _room.id);
+    });
+    const room = await this.getRoomById(_room.id);
     return room;
   }
 
@@ -175,6 +228,11 @@ export class RoomsService {
       type: 'user',
     });
     return roomMember;
+  }
+
+  async addRoomMembers(userIds: number[], roomId: number) {
+    const roomMembers = await Promise.allSettled(userIds.map(userId => this.addRoomMember(userId, roomId)));
+    return roomMembers;
   }
 
   async updateRoomMember(userId: number, type: RoomMemberType, roomId: number) {
