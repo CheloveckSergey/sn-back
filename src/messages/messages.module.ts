@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Message } from './messages.model';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { RoomsModule } from 'src/rooms/rooms.module';
+import { MReadHistoryModule } from 'src/m-read-history/m-read-history.module';
 
 @Module({
   controllers: [MessagesController],
@@ -13,6 +14,7 @@ import { RoomsModule } from 'src/rooms/rooms.module';
     SequelizeModule.forFeature([
       Message,
     ]),
+    MReadHistoryModule,
   ],
   exports: [
     MessagesService,

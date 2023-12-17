@@ -2,14 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Message } from './messages.model';
 import { User } from 'src/users/users.model';
-import { RoomsService } from 'src/rooms/rooms.service';
 import { Room } from 'src/rooms/rooms.model';
+import { MReadHistoryService } from 'src/m-read-history/m-read-history.service';
 
 @Injectable()
 export class MessagesService {
 
   constructor(
     @InjectModel(Message) private messagesRep: typeof Message,
+    private mReadHistoryService: MReadHistoryService,
   ) {}
 
   async getMessageById(id: number) {
@@ -43,6 +44,12 @@ export class MessagesService {
         }
       ]
     });
+    return messages;
+  }
+
+  async getAllUnreadMessages(userId: number) {
+    const statuses = await this.mReadHistoryService.getAllUnreadByUserId(userId);
+    const messages = await Promise.all(statuses.map(async status => await this.getMessageById(status.messageId)));
     return messages;
   }
 

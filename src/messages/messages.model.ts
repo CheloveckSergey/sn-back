@@ -1,4 +1,5 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { MReadHistory } from "src/m-read-history/m-read-history.model";
 import { Room } from "src/rooms/rooms.model";
 import { User } from "src/users/users.model";
 
@@ -34,4 +35,7 @@ export class Message extends Model<Message, MessageCreationAttrs> {
 
   @BelongsTo(() => Room)
   room: Room;
+
+  @HasMany(() => MReadHistory)
+  statuses: MReadHistory;
 }

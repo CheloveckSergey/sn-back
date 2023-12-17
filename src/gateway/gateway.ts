@@ -3,6 +3,7 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSo
 import { Server } from 'socket.io';
 import { CommentsService } from "src/comments/comments.service";
 import { Creation } from "src/creations/creations.model";
+import { MReadHistoryService } from "src/m-read-history/m-read-history.service";
 import { SentMessage } from "src/messages/messages.model";
 import { MessagesService } from "src/messages/messages.service";
 import { Room } from "src/rooms/rooms.model";
@@ -19,6 +20,7 @@ export class Gateway implements OnModuleInit {
     private roomsService: RoomsService,
     private messagesService: MessagesService,
     private commentsService: CommentsService,
+    private mReadHistorySerivce: MReadHistoryService,
   ) {}
 
   @WebSocketServer()
@@ -35,7 +37,21 @@ export class Gateway implements OnModuleInit {
   @SubscribeMessage('message')
   async onMessage(@MessageBody() message: SentMessage) {
     const dbMessage = await this.messagesService.createMessage(message.userId, message.roomId, message.text);
+    const members = await this.roomsService.getAllMembersByRoom(message.roomId);
+    const userIds = members.map(member => member.userId);
+    await this.mReadHistorySerivce.createAllStatusesByMessage(dbMessage.id, userIds);
     this.server.to(String(message.roomId)).emit('message', dbMessage);
+  }
+
+  @SubscribeMessage('readMessage')
+  async onReadMessage(@MessageBody() readMessage: {
+    messageId: number,
+    userId: number,
+    roomId: number,
+  }) {
+    console.log(readMessage);
+    const newStatus = await this.mReadHistorySerivce.readMessage(readMessage.messageId, readMessage.userId);
+    this.server.to(String(readMessage.roomId)).emit('readMessage', newStatus);
   }
 
   @SubscribeMessage('createRoom')

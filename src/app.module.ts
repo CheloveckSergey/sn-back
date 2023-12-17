@@ -41,6 +41,8 @@ import { Room } from "./rooms/rooms.model";
 import { RoomMember } from "./rooms/room-members.model";
 import { GatewayModule } from './gateway/gateway.module';
 import { ServiceModule } from './service/service.module';
+import { MReadHistoryModule } from './m-read-history/m-read-history.module';
+import { MReadHistory } from "./m-read-history/m-read-history.model";
 
 @Module({
   imports: [
@@ -76,6 +78,7 @@ import { ServiceModule } from './service/service.module';
         Message,
         Room,
         RoomMember,
+        MReadHistory,
       ],
       autoLoadModels: true,
     }),
@@ -96,6 +99,7 @@ import { ServiceModule } from './service/service.module';
     RoomsModule,
     GatewayModule,
     ServiceModule,
+    MReadHistoryModule,
   ]
 })
 export class AppModule {}

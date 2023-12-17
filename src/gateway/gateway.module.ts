@@ -5,6 +5,7 @@ import { MessagesService } from 'src/messages/messages.service';
 import { RoomsModule } from 'src/rooms/rooms.module';
 import { MessagesModule } from 'src/messages/messages.module';
 import { CommentsModule } from 'src/comments/comments.module';
+import { MReadHistoryModule } from 'src/m-read-history/m-read-history.module';
 
 @Module({
   providers: [
@@ -14,6 +15,7 @@ import { CommentsModule } from 'src/comments/comments.module';
     RoomsModule,
     MessagesModule,
     CommentsModule,
+    MReadHistoryModule,
   ]
 })
 export class GatewayModule {}

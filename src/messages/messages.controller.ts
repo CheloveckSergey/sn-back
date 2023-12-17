@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 
 @Controller('messages')
@@ -6,4 +6,10 @@ export class MessagesController {
 
   constructor(private messagesService: MessagesService) {}
 
+  @Get('/getAllUnread/:userId')
+  async getAllUnread(
+    @Param('userId') userId: number,
+  ) {
+    return this.messagesService.getAllUnreadMessages(userId);
+  }
 }
