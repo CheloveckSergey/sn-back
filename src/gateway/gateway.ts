@@ -9,6 +9,14 @@ import { MessagesService } from "src/messages/messages.service";
 import { Room } from "src/rooms/rooms.model";
 import { RoomsService } from "src/rooms/rooms.service";
 
+type ConnectCommentsDto = {
+  creationId: number,
+}
+
+type DiscCommReqDto = {
+  creationId: number,
+}
+
 @WebSocketGateway({
   cors: {
     origin: ['http://localhost:3000']
@@ -49,7 +57,6 @@ export class Gateway implements OnModuleInit {
     userId: number,
     roomId: number,
   }) {
-    console.log(readMessage);
     const newStatus = await this.mReadHistorySerivce.readMessage(readMessage.messageId, readMessage.userId);
     this.server.to(String(readMessage.roomId)).emit('readMessage', newStatus);
   }
@@ -70,30 +77,54 @@ export class Gateway implements OnModuleInit {
     })
   }
 
-  @SubscribeMessage('openCreationComments')
-  async onOpenCreationComments(@MessageBody() {userId, creationId} : {userId: number, creationId: number}) {
-    const clients = await this.server.fetchSockets();
-    const client = clients.find(client => client.handshake.auth.authDto.id == userId);
-    if (client) {
-      client.join('creation' + creationId);
-    }
-  }
+  // @SubscribeMessage('openCreationComments')
+  // async onOpenCreationComments(@MessageBody() {userId, creationId} : {userId: number, creationId: number}) {
+  //   const clients = await this.server.fetchSockets();
+  //   const client = clients.find(client => client.handshake.auth.authDto.id == userId);
+  //   if (client) {
+  //     client.join('creation' + creationId);
+  //   }
+  // }
 
-  @SubscribeMessage('comment')
+  @SubscribeMessage('sendComment')
   async onComment(
     @MessageBody() reqCommentDto: {text: string, creationId: number, authorId: number},
-    @ConnectedSocket() client,
   ) {
+    console.log('sendComment');
+    console.log(reqCommentDto);
     const comment = await this.commentsService.createComment(
       reqCommentDto.authorId,
       reqCommentDto.text,
       reqCommentDto.creationId,
     );
-    this.server.to('creation' + reqCommentDto.creationId).emit('comment', comment);
+    this.server.to('c' + reqCommentDto.creationId).emit('comment', {comment});
   }
 
-  async joinRoom(userIds: number[]) {
-    const clients = await this.server.fetchSockets();
+  @SubscribeMessage('connectComments')
+  async connectComments(
+    @MessageBody() dto: ConnectCommentsDto,
+    @ConnectedSocket() client,
+  ) {
+    console.log('connectComments')
     
+    await this.disconnectComments(client);
+
+    client.join('c' + dto.creationId);
+
+    const conComResDto: ConnectCommentsDto = { creationId: dto.creationId }
+    client.emit('connectComments', conComResDto);
+  }
+
+  async disconnectComments(client) {
+    const rooms = Array.from(client.rooms);
+    
+    const commentsRooms = rooms.filter(room => room[0] === 'c');
+    for (let commentsRoom of commentsRooms) {
+      client.leave(commentsRoom);
+      // const discCommReqDto: DiscCommReqDto = {
+
+      // }
+      // client.emit('disconnectComments', )
+    }
   }
 }

@@ -55,12 +55,13 @@ export class CommentsService {
 
   async createComment(authorId: number, text: string, creationId: number) {
     const ownCreation = await this.creationsService.createCreation(authorId, CrTypeCodes.COMMENT);
-    const comment = await this.commentRepository.create({
+    const _comment = await this.commentRepository.create({
       authorId,
       text,
       ownCreationId: ownCreation.id,
       creationId,
     })
+    const comment = await this.getCommentById(_comment.id); 
     return comment;
   }
 

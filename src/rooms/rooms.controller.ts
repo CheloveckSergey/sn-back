@@ -91,8 +91,6 @@ export class RoomsController {
   async addRoomMembers(
     @Body() dto: { userIds: number[], roomId: number }
   ) {
-    console.log('\n\nADD_ROOM_MEMBERS');
-    console.log(dto);
     return this.roomService.addRoomMembers(dto.userIds, dto.roomId);
   }
 
