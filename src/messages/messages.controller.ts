@@ -12,4 +12,11 @@ export class MessagesController {
   ) {
     return this.messagesService.getAllUnreadMessages(userId);
   }
+
+  @Get('/getMessagesByRoom/:roomId')
+  async getMessagesByRoom(
+    @Param('roomId') roomId: number,
+  ) {
+    return this.messagesService.getMessagesByRoomId(roomId);
+  }
 }

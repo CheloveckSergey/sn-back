@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { CommentsService } from "src/comments/comments.service";
 import { Creation } from "src/creations/creations.model";
 import { MReadHistoryService } from "src/m-read-history/m-read-history.service";
-import { SentMessage } from "src/messages/messages.model";
+import { Message, SentMessage } from "src/messages/messages.model";
 import { MessagesService } from "src/messages/messages.service";
 import { Room } from "src/rooms/rooms.model";
 import { RoomsService } from "src/rooms/rooms.service";
@@ -57,6 +57,7 @@ export class Gateway implements OnModuleInit {
     userId: number,
     roomId: number,
   }) {
+    console.log(readMessage);
     const newStatus = await this.mReadHistorySerivce.readMessage(readMessage.messageId, readMessage.userId);
     this.server.to(String(readMessage.roomId)).emit('readMessage', newStatus);
   }
@@ -126,5 +127,9 @@ export class Gateway implements OnModuleInit {
       // }
       // client.emit('disconnectComments', )
     }
+  }
+
+  async emitDeleteMessage(message: Message) {
+    this.server.to(String(message.roomId)).emit('deleteMessage', message);
   }
 }

@@ -17,6 +17,8 @@ export class MReadHistory extends Model<MReadHistory, MRHCreationAttrs> {
   @Column({type: DataType.INTEGER, allowNull: false})
   userId: number;
 
+  @BelongsTo(() => User)
+  user: User;
   
   @ForeignKey(() => Message)
   @Column({type: DataType.INTEGER, allowNull: false})

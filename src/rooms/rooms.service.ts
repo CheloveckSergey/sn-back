@@ -175,6 +175,7 @@ export class RoomsService {
 
   async createGeneralRoom(adminId: number, name: string, userIds: number[], avatar?: Express.Multer.File) {
     const _room = await this.createRoom(adminId, 'general', name, avatar);
+    
     userIds.forEach(async (userId) => {
       await this.addRoomMember(userId, _room.id);
     });

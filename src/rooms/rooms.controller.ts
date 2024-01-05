@@ -54,12 +54,21 @@ export class RoomsController {
   @UseInterceptors(FileInterceptor('img'))
   @Post('/createGeneralRoom')
   async createGeneralRoom(
-    @Body() dto,
+    @Body() dto: {
+      adminId: number,
+      name: string,
+      userIds: number[] | undefined,
+    },
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log('CREATE_G_ROOM\n\n');
-    console.log(dto);
-    return this.roomService.createGeneralRoom(dto.adminId, dto.name, dto.userIds, file);
+    //Из-за того, что нельзя послать пустой массив в каком то поле, здесь может быть undefined
+    let userIds;
+    if (!dto.userIds) {
+      userIds = [];
+    } else {
+      userIds = dto.userIds;
+    }
+    return this.roomService.createGeneralRoom(dto.adminId, dto.name, userIds, file);
   }
 
   @Post('/createPersonalRoom')

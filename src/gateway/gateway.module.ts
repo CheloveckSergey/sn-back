@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { Gateway } from './gateway';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { MessagesService } from 'src/messages/messages.service';
@@ -13,9 +13,12 @@ import { MReadHistoryModule } from 'src/m-read-history/m-read-history.module';
   ],
   imports: [
     RoomsModule,
-    MessagesModule,
+    forwardRef(() => MessagesModule),
     CommentsModule,
     MReadHistoryModule,
+  ],
+  exports: [
+    Gateway,
   ]
 })
 export class GatewayModule {}
