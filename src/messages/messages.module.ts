@@ -16,7 +16,6 @@ import { GatewayModule } from 'src/gateway/gateway.module';
       Message,
     ]),
     MReadHistoryModule,
-    forwardRef(() => GatewayModule),
   ],
   exports: [
     MessagesService,

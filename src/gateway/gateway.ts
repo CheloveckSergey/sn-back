@@ -51,6 +51,12 @@ export class Gateway implements OnModuleInit {
     this.server.to(String(message.roomId)).emit('message', dbMessage);
   }
 
+  @SubscribeMessage('deleteMessage')
+  async onDeleteMessage(@MessageBody() message: Message) {
+    const dbMessage = await this.messagesService.deleteMessageById(message.id);
+    this.server.to(String(message.roomId)).emit('deleteMessage', dbMessage);
+  }
+
   @SubscribeMessage('readMessage')
   async onReadMessage(@MessageBody() readMessage: {
     messageId: number,

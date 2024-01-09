@@ -13,12 +13,9 @@ import { MReadHistoryModule } from 'src/m-read-history/m-read-history.module';
   ],
   imports: [
     RoomsModule,
-    forwardRef(() => MessagesModule),
+    MessagesModule,
     CommentsModule,
     MReadHistoryModule,
   ],
-  exports: [
-    Gateway,
-  ]
 })
 export class GatewayModule {}

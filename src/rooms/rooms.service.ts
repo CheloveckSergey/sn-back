@@ -12,6 +12,7 @@ import * as path from 'path';
 import { writeFile } from 'fs/promises';
 import { UsersService } from 'src/users/users.service';
 import { ImageService, MyImage } from 'src/service/image.service';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class RoomsService {
@@ -108,6 +109,14 @@ export class RoomsService {
         {
           model: Message,
           as: 'messages',
+          // order: [
+          //   sequelize.fn('max', sequelize.col('created_at')),
+          //   'DESC',
+          // ],
+          order: [
+            ['createdAt', 'DESC'],
+          ],
+          limit: 1,
         },
         {
           model: RoomMember,

@@ -4,7 +4,6 @@ import { Message } from './messages.model';
 import { User } from 'src/users/users.model';
 import { Room } from 'src/rooms/rooms.model';
 import { MReadHistoryService } from 'src/m-read-history/m-read-history.service';
-import { Gateway } from 'src/gateway/gateway';
 
 export interface _Message {
   id: number,
@@ -24,7 +23,6 @@ export class MessagesService {
   constructor(
     @InjectModel(Message) private messagesRep: typeof Message,
     private mReadHistoryService: MReadHistoryService,
-    // private gateway: Gateway,
   ) {}
 
   async getMessageById(id: number): Promise<_Message> {
@@ -90,7 +88,8 @@ export class MessagesService {
     }
     await this.mReadHistoryService.deleteAllStatusesByMessage(id);
     await message.destroy();
-    return {message: 'Удалено так сказац'};
+    message.save();
+    return message;
   }
 
   async mapMessage(message: Message): Promise<_Message> {
