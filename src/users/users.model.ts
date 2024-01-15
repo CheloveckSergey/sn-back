@@ -6,7 +6,7 @@ import { UserRoles } from "src/roles/user-roles.model";
 import { Author } from "src/author/author.model";
 import { Author_Subs } from "src/author/author-subs.model";
 import { GroupMember } from "src/group/group-members.model";
-import { User_Friend } from "./user-friends.model";
+import { User_Friend } from "src/friends/user-friends.model";
 import { UserDesc } from "src/user-desc/user-desc.model";
 import { Message } from "src/messages/messages.model";
 

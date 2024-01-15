@@ -31,7 +31,7 @@ import { UserRoles } from "./roles/user-roles.model";
 import { RolesModule } from "./roles/roles.module";
 import { UserDesc } from "./user-desc/user-desc.model";
 import { UserDescModule } from "./user-desc/user-desc.module";
-import { User_Friend } from "./users/user-friends.model";
+import { User_Friend } from "./friends/user-friends.model";
 import { User } from "./users/users.model";
 import { UsersModule } from "./users/users.module";
 import { MessagesModule } from './messages/messages.module';
@@ -43,6 +43,8 @@ import { GatewayModule } from './gateway/gateway.module';
 import { ServiceModule } from './service/service.module';
 import { MReadHistoryModule } from './m-read-history/m-read-history.module';
 import { MReadHistory } from "./m-read-history/m-read-history.model";
+import { FriendRequest } from "./friends/friend-requests.model";
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -79,6 +81,7 @@ import { MReadHistory } from "./m-read-history/m-read-history.model";
         Room,
         RoomMember,
         MReadHistory,
+        FriendRequest,
       ],
       autoLoadModels: true,
     }),
@@ -100,6 +103,7 @@ import { MReadHistory } from "./m-read-history/m-read-history.model";
     GatewayModule,
     ServiceModule,
     MReadHistoryModule,
+    FriendsModule,
   ]
 })
 export class AppModule {}

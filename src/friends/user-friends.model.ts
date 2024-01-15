@@ -1,5 +1,4 @@
-import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
-import { User } from "./users.model";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 interface User_FriendAttrs {
   userId1: number,

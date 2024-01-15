@@ -39,14 +39,15 @@ export class UsersController {
     return this.userService.getUserById(id, req.userPayload.id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/getOneUserById/:id')
-  getOneUserById(
-    @Param('id') id: number,
-    @Req() req: { userPayload: Payload },
-  ) {
-    return this.userService.getOneUserById(id, req.userPayload.id);
-  }
+  //Проблема со экспортами друзей и юзеров
+  // @UseGuards(JwtAuthGuard)
+  // @Get('/getOneUserById/:id')
+  // getOneUserById(
+  //   @Param('id') id: number,
+  //   @Req() req: { userPayload: Payload },
+  // ) {
+  //   return this.userService.getOneUserById(id, req.userPayload.id);
+  // }
 
   // @Get('/avatar/:id')
   // getAvatar(@Param('id') id: number) {
@@ -64,42 +65,6 @@ export class UsersController {
   ) {
     const newFile = await this.userService.createAvatar(req.userPayload.id, file);
     return newFile;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('/createFriendship')
-  async createFriendship(
-    @Body() dto: { userId1: number, userId2: number },
-    @Req() req,
-  ) {
-    return this.userService.createFriendship(dto.userId1, dto.userId2);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('/deleteFriendship/:userId')
-  async deleteFriendship(
-    @Param('userId') userId: number,
-    @Req() req,
-  ) {
-    return this.userService.deleteFriend(req.userPayload.id, userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/getPossibleFriends/:userId')
-  async getPossibleFriends(
-    @Req() req,
-    @Param('userId') userId: number,
-  ) {
-    return this.userService.getPossibleFriends(userId);
-  }
-  
-  @UseGuards(JwtAuthGuard)
-  @Get('/getAllFriends/:userId')
-  async getAllFriends(
-    @Req() req,
-    @Param('userId') userId: number,
-  ) {
-    return this.userService.getFriendsByUserId(userId);
   }
 
   // @Get('/getAllSubsByAuthorId/:authorId')

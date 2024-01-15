@@ -13,6 +13,7 @@ import { writeFile } from 'fs/promises';
 import { UsersService } from 'src/users/users.service';
 import { ImageService, MyImage } from 'src/service/image.service';
 import sequelize from 'sequelize';
+import { FriendsService } from 'src/friends/friends.service';
 
 @Injectable()
 export class RoomsService {
@@ -21,8 +22,8 @@ export class RoomsService {
     @InjectModel(Room) private roomRep: typeof Room,
     @InjectModel(RoomMember) private roomMemberRep: typeof RoomMember,
     private messagesService: MessagesService,
-    private usersService: UsersService,
     private imageService: ImageService,
+    private friendsService: FriendsService,
   ) {}
 
   async getRoomById(id: number) {
@@ -149,7 +150,7 @@ export class RoomsService {
   }
 
   async getAllPossibleMembers(roomId: number, userId: number) {
-    const friends = await this.usersService.getFriendsByUserId(userId);
+    const friends = await this.friendsService.getFriendsByUserId(userId);
     const roomMembers = await this.getAllMembersByRoom(roomId);
     const possibleMembers = friends.filter(friend => {
       for (let roomMember of roomMembers) {
