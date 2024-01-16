@@ -7,12 +7,7 @@ import { Op } from 'sequelize';
 import { Message } from 'src/messages/messages.model';
 import { MessagesService } from 'src/messages/messages.service';
 import { User } from 'src/users/users.model';
-import * as uuid from 'uuid';
-import * as path from 'path';
-import { writeFile } from 'fs/promises';
-import { UsersService } from 'src/users/users.service';
 import { ImageService, MyImage } from 'src/service/image.service';
-import sequelize from 'sequelize';
 import { FriendsService } from 'src/friends/friends.service';
 
 @Injectable()
@@ -32,16 +27,6 @@ export class RoomsService {
         id
       },
       include: [
-        {
-          model: Message,
-          as: 'messages',
-          include: [
-            {
-              model: User,
-              as: 'user',
-            }
-          ]
-        },
         {
           model: RoomMember,
           as: 'roomMembers',
@@ -110,10 +95,6 @@ export class RoomsService {
         {
           model: Message,
           as: 'messages',
-          // order: [
-          //   sequelize.fn('max', sequelize.col('created_at')),
-          //   'DESC',
-          // ],
           order: [
             ['createdAt', 'DESC'],
           ],
@@ -164,7 +145,6 @@ export class RoomsService {
   }
 
   async createRoom(userId: number, type: RoomType, name?: string, avatar?: Express.Multer.File) {
-    // let imageName: string | undefined = undefined;
     let image: MyImage | undefined;
     if (avatar) {
       image = this.imageService.createMyImage(avatar);
@@ -180,7 +160,8 @@ export class RoomsService {
       roomId: room.id,
       type: 'admin',
     });
-    return room;
+    const _room = await this.getRoomById(room.id);
+    return _room;
   }
 
   async createGeneralRoom(adminId: number, name: string, userIds: number[], avatar?: Express.Multer.File) {
@@ -199,19 +180,20 @@ export class RoomsService {
       throw new HttpException('Такая комнатка уже существует', HttpStatus.BAD_REQUEST);
     }
 
-    const room = await this.roomRep.create({
+    const _room = await this.roomRep.create({
       type: 'personal',
     });
     const roomMember1 = await this.roomMemberRep.create({
       userId: userId1,
-      roomId: room.id,
+      roomId: _room.id,
       type: 'admin',
     });
     const roomMember2 = await this.roomMemberRep.create({
       userId: userId2,
-      roomId: room.id,
+      roomId: _room.id,
       type: 'admin',
     });
+    const room = await this.getRoomById(_room.id);
     return room;
   }
 

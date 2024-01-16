@@ -173,4 +173,11 @@ export class PostsService {
     await post.destroy();
     return {message: 'Пост успешно удалён. Это успех, я считаю'};
   }
+
+  /////////////////////////////////////////////////////////////////////////
+
+  async getFeedByAuthorId(authorId: number) {
+    const posts = await this.getAllPostsByAuthorId(authorId);
+    return posts;
+  }
 }

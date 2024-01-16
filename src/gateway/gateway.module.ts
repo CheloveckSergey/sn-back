@@ -17,5 +17,8 @@ import { MReadHistoryModule } from 'src/m-read-history/m-read-history.module';
     CommentsModule,
     MReadHistoryModule,
   ],
+  exports: [
+    Gateway,
+  ]
 })
 export class GatewayModule {}

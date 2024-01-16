@@ -7,6 +7,7 @@ import { FriendsService } from './friends.service';
 import { User_Friend } from './user-friends.model';
 import { UsersModule } from 'src/users/users.module';
 import { AuthorModule } from 'src/author/author.module';
+import { GatewayModule } from 'src/gateway/gateway.module';
 
 @Module({
   controllers: [FriendsController],
