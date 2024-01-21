@@ -28,6 +28,9 @@ export class AlbumsService {
 
   async getAllAlbumsByAuthorId(authorId: number) {
     const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.ALBUM, authorId);
+    if (!creations) {
+      return [];
+    }
     const albums = await this.albumRep.findAll({
       where: {
         creationId: {
@@ -39,6 +42,23 @@ export class AlbumsService {
       ]
     });
     return albums;
+  }
+
+  async getAlbumByName(name: string, authorId: number): Promise<Album | null> {
+    const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.ALBUM, authorId);
+    if (!creations) {
+      return null;
+    }
+
+    const album = await this.albumRep.findOne({
+      where: {
+        name,
+        creationId: {
+          [Op.or]: creations.map(creation => creation.id),
+        },
+      }
+    });
+    return album;
   }
 
   async createAlbum(authorId: number, name: string) {

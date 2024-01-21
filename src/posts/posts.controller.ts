@@ -80,4 +80,12 @@ export class PostsController {
   // ) {
   //   return this.postUserService.getFeedByUserId(req.userPayload.id);
   // }
+  @UseGuards(JwtAuthGuard)
+  @Get('/getFeedByAuthorId/:authorId')
+  getFeedByUserId(
+    @Param('authorId') authorId: number,
+    @Req() req: {userPayload: Payload},
+  ) {
+    return this.postsService.getFeedByAuthorId(req.userPayload.id, authorId);
+  }
 }

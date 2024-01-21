@@ -13,6 +13,9 @@ import { Album } from './albums.model';
       Album
     ]),
     CreationsModule,
+  ],
+  exports: [
+    AlbumsService,
   ]
 })
 export class AlbumsModule {}

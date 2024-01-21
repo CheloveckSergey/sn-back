@@ -4,6 +4,7 @@ import { AlbumImagesService } from './album-images.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AlbumImage } from './album-images.model';
 import { CreationsModule } from 'src/creations/creations.module';
+import { AlbumsModule } from 'src/albums/albums.module';
 
 @Module({
   controllers: [AlbumImagesController],
@@ -11,6 +12,7 @@ import { CreationsModule } from 'src/creations/creations.module';
   imports: [
     SequelizeModule.forFeature([AlbumImage]),
     CreationsModule,
+    AlbumsModule,
   ],
 })
 export class ImagesModule {}

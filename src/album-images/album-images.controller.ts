@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseIn
 import { AlbumImagesService } from './album-images.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Payload } from 'src/auth/dto/auth.dto';
 
 @Controller('album-images')
 export class AlbumImagesController {
@@ -16,14 +17,23 @@ export class AlbumImagesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/getAllAlbumImagesByAuthor/:authorId')
+  async getAllAlbumImagesByAuthor(
+    @Param('authorId') authorId: number,
+    @Req() req: {userPayload: Payload},
+  ) {
+    return this.imagesService.getAllAlbumImagesByAuthor(authorId, req.userPayload.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('/create')
   @UseInterceptors(FileInterceptor('img'))
   async createImageByUserId(
     @UploadedFile() file: Express.Multer.File,
     @Req() req,
-    @Body() dto: {albumId: number, authorId: number}
+    @Body() dto: {authorId: number, albumId?: number}
   ) {
-    return this.imagesService.create(dto.albumId, dto.authorId, file);
+    return this.imagesService.create(dto.authorId, file, dto.albumId);
   }
 
   // @UseGuards(JwtAuthGuard)

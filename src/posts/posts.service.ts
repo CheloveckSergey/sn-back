@@ -10,6 +10,7 @@ import { Creation } from 'src/creations/creations.model';
 import { Like } from 'src/likes/likes.model';
 import { Comment } from 'src/comments/comments.model';
 import { Author } from 'src/author/author.model';
+import { AuthorType } from 'src/author/author-types.model';
 
 @Injectable()
 export class PostsService {
@@ -80,6 +81,12 @@ export class PostsService {
                     {
                       model: Author,
                       as: 'author',
+                      include: [
+                        {
+                          model: AuthorType,
+                          as: 'type',
+                        }
+                      ]
                     },
                     {
                       model: Like,
@@ -176,8 +183,8 @@ export class PostsService {
 
   /////////////////////////////////////////////////////////////////////////
 
-  async getFeedByAuthorId(authorId: number) {
-    const posts = await this.getAllPostsByAuthorId(authorId);
+  async getFeedByAuthorId(userId: number, authorId: number) {
+    const posts = await this.getAllOnePostsByAuthorId(userId, authorId);
     return posts;
   }
 }
