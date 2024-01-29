@@ -4,18 +4,6 @@ import { CreationType } from "./creation-types.model";
 import { Comment } from "src/comments/comments.model";
 import { Like } from "src/likes/likes.model";
 
-// export interface OneCreation {
-//   id: number,
-//   authorId: number,
-//   author: OneAuthor,
-//   typeId: number,
-//   type: CreationType,
-//   commentNumber: number,
-//   likeNumber: number,
-//   isLiked: boolean,
-//   createdAt: string,
-//   updatedAt: string,
-// }
 export interface OneCreation {
   id: number,
   authorId: number,

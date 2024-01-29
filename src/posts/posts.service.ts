@@ -141,8 +141,9 @@ export class PostsService {
 
   async getOnePostByPost(userId: number, post: Post): Promise<OnePost> {
     const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
-    const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => 
-      this.postImagesService.getOnePostImage(userId, postImage)));
+    const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
+      return this.postImagesService.getOnePostImage(userId, postImage);
+    }));
     const onePost: OnePost = {
       id: post.id,
       description: post.description,

@@ -6,7 +6,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 type CrBody = {
   authorId: number,
   text: string,
-  creationId: number
+  creationId: number,
+  responseToCommentId?: number,
 }
 
 @Controller('comments')
@@ -32,9 +33,9 @@ export class CommentsController {
   @Post('/createComment')
   async createComment(
     @Body() dto: CrBody,
-    @Req() req,
   ) {
-    return this.commentsService.createComment(dto.authorId, dto.text, dto.creationId);
+    console.log(dto);
+    return this.commentsService.createComment(dto.authorId, dto.text, dto.creationId, dto.responseToCommentId);
   }
 
   // @UseGuards(JwtAuthGuard)

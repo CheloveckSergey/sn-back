@@ -28,6 +28,20 @@ export class CommentsService {
             Author,
             Like,
           ]
+        },
+        {
+          model: Comment,
+          as: 'responseToComment',
+          include: [
+            {
+              model: Creation,
+              as: 'ownCreation',
+              include: [
+                Author,
+                Like,
+              ],
+            }
+          ],
         }
       ]
     });
@@ -46,20 +60,35 @@ export class CommentsService {
           include: [
             Author,
             Like,
-          ]
+          ],
+        },
+        {
+          model: Comment,
+          as: 'responseToComment',
+          include: [
+            {
+              model: Creation,
+              as: 'ownCreation',
+              include: [
+                Author,
+                Like,
+              ],
+            }
+          ],
         }
       ]
     });
     return comments;
   }
 
-  async createComment(authorId: number, text: string, creationId: number) {
+  async createComment(authorId: number, text: string, creationId: number, responseToCommentId?: number) {
     const ownCreation = await this.creationsService.createCreation(authorId, CrTypeCodes.COMMENT);
     const _comment = await this.commentRepository.create({
       authorId,
       text,
       ownCreationId: ownCreation.id,
       creationId,
+      responseToCommentId,
     })
     const comment = await this.getCommentById(_comment.id); 
     return comment;

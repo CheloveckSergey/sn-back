@@ -1,6 +1,7 @@
 import { OnModuleInit } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from 'socket.io';
+import { Comment } from "src/comments/comments.model";
 import { CommentsService } from "src/comments/comments.service";
 import { Creation } from "src/creations/creations.model";
 import { MReadHistoryService } from "src/m-read-history/m-read-history.service";
@@ -95,16 +96,11 @@ export class Gateway implements OnModuleInit {
 
   @SubscribeMessage('sendComment')
   async onComment(
-    @MessageBody() reqCommentDto: {text: string, creationId: number, authorId: number},
+    @MessageBody() reqCommentDto: {comment: Comment},
   ) {
     console.log('sendComment');
     console.log(reqCommentDto);
-    const comment = await this.commentsService.createComment(
-      reqCommentDto.authorId,
-      reqCommentDto.text,
-      reqCommentDto.creationId,
-    );
-    this.server.to('c' + reqCommentDto.creationId).emit('comment', {comment});
+    this.server.to('c' + reqCommentDto.comment.creationId).emit('comment', {comment: reqCommentDto.comment});
   }
 
   @SubscribeMessage('connectComments')
