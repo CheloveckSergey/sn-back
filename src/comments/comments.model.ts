@@ -1,18 +1,15 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
-import { OneAuthor } from "src/author/author.model";
-import { CreationType } from "src/creations/creation-types.model";
-import { Creation } from "src/creations/creations.model";
+import { Creation, OneCommentCreation } from "src/creations/creations.model";
 
-export interface OneCommentCreation {
+export interface OneComment {
   id: number,
-  authorId: number,
-  author: OneAuthor,
-  typeId: number,
-  type: CreationType,
-  likeNumber: number,
-  isLiked: boolean,
-  createdAt: string,
-  updatedAt: string,
+  text: string,
+  ownCreationId: number,
+  ownCreation: OneCommentCreation,
+  creationId: number,
+  creation: Creation,
+  responseToCommentId: number,
+  responseToComment: Comment,
 }
 
 interface CommentCreationAttrs {
@@ -21,6 +18,7 @@ interface CommentCreationAttrs {
   creationId: number,
   ownCreationId: number,
   responseToCommentId?: number,
+  responseToComment: Comment,
 }
 
 @Table({

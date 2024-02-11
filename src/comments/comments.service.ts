@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Comment } from './comments.model';
+import { Comment, OneComment } from './comments.model';
 import { CreationsService } from 'src/creations/creations.service';
 import { Author } from 'src/author/author.model';
 import { Creation } from 'src/creations/creations.model';
@@ -15,7 +15,7 @@ export class CommentsService {
     private creationsService: CreationsService,
   ) {}
 
-  async getCommentById(commentId: number) {
+  async getCommentById(userId: number, commentId: number): Promise<OneComment> {
     const comment = await this.commentRepository.findOne({
       where: {
         id: commentId,
@@ -45,10 +45,11 @@ export class CommentsService {
         }
       ]
     });
-    return comment;
+    const oneComment: OneComment = await this.getOneCommentByComment(userId, comment)
+    return oneComment;
   }
 
-  async getAllCommentsToCreationId(creationId: number) {
+  async getAllCommentsToCreationId(userId: number, creationId: number): Promise<OneComment[]> {
     const comments = await this.commentRepository.findAll({
       where: {
         creationId,
@@ -78,10 +79,11 @@ export class CommentsService {
         }
       ]
     });
-    return comments;
+    const oneComments: OneComment[] = await Promise.all(comments.map(comment => this.getOneCommentByComment(userId, comment)));
+    return oneComments;
   }
 
-  async createComment(authorId: number, text: string, creationId: number, responseToCommentId?: number) {
+  async createComment(userId: number, authorId: number, text: string, creationId: number, responseToCommentId?: number) {
     const ownCreation = await this.creationsService.createCreation(authorId, CrTypeCodes.COMMENT);
     const _comment = await this.commentRepository.create({
       authorId,
@@ -90,23 +92,34 @@ export class CommentsService {
       creationId,
       responseToCommentId,
     })
-    const comment = await this.getCommentById(_comment.id); 
+    const comment = await this.getCommentById(userId, _comment.id); 
     return comment;
   }
 
-  async deleteComment(commentId: number) {
-    const comment = await this.getCommentById(commentId);
+  async deleteComment(userId: number, commentId: number) {
+    const comment = await this.getCommentById(userId, commentId);
     // const ownCreation = await this.creationsService.getCreationById(comment.ownCreationId);
     // await ownCreation.destroy();
-    await comment.destroy();
+    await this.commentRepository.destroy({
+      where: {
+        id: commentId,
+      }
+    })
     return {message: 'Коммент успешно удалён'}
   }
 
-  // async isCommented(userId: number, creationId: number) {
-  //   const comment = await this.commentRepository.findOne({
-  //     where: {
-  //       user
-  //     }
-  //   })
-  // }
+  async getOneCommentByComment(userId: number, comment: Comment): Promise<OneComment> {
+    const oneCommentCreation = await this.creationsService.getOneCommentCreationByCreation(userId, comment.ownCreation);
+    const oneComment: OneComment = {
+      id: comment.id,
+      text: comment.text,
+      ownCreationId: oneCommentCreation.id,
+      ownCreation: oneCommentCreation,
+      creationId: comment.creationId,
+      creation: comment.creation,
+      responseToCommentId: comment.responseToCommentId,
+      responseToComment: comment.responseToComment,
+    }
+    return oneComment;
+  }
 }

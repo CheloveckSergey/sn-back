@@ -30,10 +30,10 @@ export class AlbumImagesController {
   @UseInterceptors(FileInterceptor('img'))
   async createImageByUserId(
     @UploadedFile() file: Express.Multer.File,
-    @Req() req,
+    @Req() req: {userPayload: Payload},
     @Body() dto: {authorId: number, albumId?: number}
   ) {
-    return this.imagesService.create(dto.authorId, file, dto.albumId);
+    return this.imagesService.create(dto.authorId, file, req.userPayload.id, dto.albumId);
   }
 
   // @UseGuards(JwtAuthGuard)

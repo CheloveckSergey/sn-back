@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseIn
 import { CommentsService } from './comments.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Payload } from 'src/auth/dto/auth.dto';
 
 type CrBody = {
   authorId: number,
@@ -15,11 +16,13 @@ export class CommentsController {
 
   constructor(private commentsService: CommentsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getCommentsToCreationId/:id')
   async getCommentsToCreationId(
-    @Param('id') creationId: number
+    @Param('id') creationId: number,
+    @Req() req: {userPayload: Payload}
   ) {
-    return this.commentsService.getAllCommentsToCreationId(creationId);
+    return this.commentsService.getAllCommentsToCreationId(req.userPayload.id, creationId);
   }
 
   // @Get('/getCommentsByPostId/:postId')
@@ -33,9 +36,10 @@ export class CommentsController {
   @Post('/createComment')
   async createComment(
     @Body() dto: CrBody,
+    @Req() req: {userPayload: Payload},
   ) {
     console.log(dto);
-    return this.commentsService.createComment(dto.authorId, dto.text, dto.creationId, dto.responseToCommentId);
+    return this.commentsService.createComment(req.userPayload.id, dto.authorId, dto.text, dto.creationId, dto.responseToCommentId);
   }
 
   // @UseGuards(JwtAuthGuard)

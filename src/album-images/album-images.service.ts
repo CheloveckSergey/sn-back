@@ -84,7 +84,6 @@ export class AlbumImagesService {
       albumId: albumImage.albumId,
       creationId: oneCreation.id,
       creation: oneCreation,
-      album: albumImage.album,
     }
     return oneImage;
   }
@@ -101,7 +100,7 @@ export class AlbumImagesService {
     return images;
   }
 
-  async create(authorId: number, file: Express.Multer.File, albumId?: number) {
+  async create(authorId: number, file: Express.Multer.File, userId: number, albumId?: number) {
     if (!file) {
       throw new HttpException('Нет файла нахуй', HttpStatus.BAD_REQUEST);
     }
@@ -109,18 +108,21 @@ export class AlbumImagesService {
     const imageName = uuid.v4() + '.jpg';
     await writeFile(path.resolve('src', 'static', imageName), file.buffer);
 
-    let album: Album;
+    let _albumId: number;
     if (!albumId) {
-      album = await this.albumService.getAlbumByName('general', authorId);
+      const album = await this.albumService.getAlbumByName('general', authorId);
+      _albumId = album.id;
       if (!album) {
-        album = await this.albumService.createAlbum(authorId, 'general');
+        const album = await this.albumService.createAlbum(authorId, 'general', userId);
+        _albumId = album.id;
       }
     } else {
-      album = await this.albumService.getAlbumById(albumId);
+      const album = await this.albumService.getAlbumById(albumId);
+      _albumId = album.id;
     }
     
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.ALBUM_IMAGE);
-    const response = await this.imageRep.create({value: imageName, albumId: album.id, creationId: creation.id});
+    const response = await this.imageRep.create({value: imageName, albumId: _albumId, creationId: creation.id});
     return response;
   }
 

@@ -5,10 +5,9 @@ import { Creation, OneCreation } from "src/creations/creations.model";
 export interface OneAlbumImage {
   id: number,
   value: string,
+  albumId: number,
   creationId: number,
   creation: OneCreation,
-  albumId: number,
-  album: Album,
 }
 
 interface AICreationAttrs {
