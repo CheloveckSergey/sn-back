@@ -35,6 +35,36 @@ export class AlbumImagesService {
     return image;
   }
 
+  async getOneAlbumImageById(id: number, userId: number) {
+    const image = await this.imageRep.findOne({
+      where: {
+        id,
+      },
+      include: [
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            {
+              model: Author,
+              as: 'author',
+            },
+            {
+              model: Comment,
+              as: 'comments',
+            },
+            {
+              model: Like,
+              as: 'likes',
+            }
+          ],
+        }
+      ]
+    });
+    const oneImage: OneAlbumImage = await this.getOneImageByImage(userId, image)
+    return oneImage;
+  }
+
   async getAllAlbumImagesByAuthor(authorId: number, meUserId: number) {
     const albumImagesCreations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.ALBUM_IMAGE, authorId);
 
@@ -122,8 +152,9 @@ export class AlbumImagesService {
     }
     
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.ALBUM_IMAGE);
-    const response = await this.imageRep.create({value: imageName, albumId: _albumId, creationId: creation.id});
-    return response;
+    const _image = await this.imageRep.create({value: imageName, albumId: _albumId, creationId: creation.id});
+    const image: OneAlbumImage = await this.getOneAlbumImageById(_image.id, userId);
+    return image;
   }
 
   async deleteImageById(id: number) {
