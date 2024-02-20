@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -84,8 +84,9 @@ export class PostsController {
   @Get('/getFeedByAuthorId/:authorId')
   getFeedByUserId(
     @Param('authorId') authorId: number,
-    @Req() req: {userPayload: Payload},
+    @Req() req: { userPayload: Payload },
+    @Query() query: { offset?: number, limit?: number },
   ) {
-    return this.postsService.getFeedByAuthorId(req.userPayload.id, authorId);
+    return this.postsService.getFeedByAuthorId(authorId, req.userPayload.id, query);
   }
 }

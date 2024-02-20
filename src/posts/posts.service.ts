@@ -49,8 +49,6 @@ export class PostsService {
   }
 
   async getAllPostsByAuthorId(authorId: number) {
-    console.log('GET_ALL_POSTS_BY_AUTHOR_ID');
-    console.log('AUTHOR_ID: ' + authorId);
     const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, authorId);
     if (!creations.length) {
       return [];
@@ -184,8 +182,99 @@ export class PostsService {
 
   /////////////////////////////////////////////////////////////////////////
 
-  async getFeedByAuthorId(userId: number, authorId: number) {
-    const posts = await this.getAllOnePostsByAuthorId(userId, authorId);
-    return posts;
+  async getFeedByAuthorId(authorId: number, userId: number, query: { offset?: number, limit?: number }) {
+    console.log(query);
+    const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, authorId);
+    if (!creations.length) {
+      return [];
+    }
+    const posts = await this.postRepository.findAll({
+      where: {
+        creationId: {
+          [Op.or]: creations.map(creation => creation.id),
+        }
+      },
+      order: [
+        ['createdAt', 'DESC']
+      ],
+      offset: Number(query.offset),
+      limit: Number(query.limit),
+      include: [
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            {
+              model: Like,
+              as: 'likes',
+            },
+            {
+              model: Comment,
+              as: 'comments',
+              include: [
+                {
+                  model: Creation,
+                  as: 'ownCreation',
+                  include: [
+                    {
+                      model: Author,
+                      as: 'author',
+                      include: [
+                        {
+                          model: AuthorType,
+                          as: 'type',
+                        }
+                      ]
+                    },
+                    {
+                      model: Like,
+                      as: 'likes',
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              model: Author,
+              as: 'author',
+            },
+          ]
+        },
+        {
+          model: PostImage,
+          as: 'postImages',
+          include: [
+            {
+              model: Creation,
+              as: 'creation',
+              include: [
+                {
+                  model: Like,
+                  as: 'likes',
+                },
+                {
+                  model: Comment,
+                  as: 'comments',
+                },
+                {
+                  model: Author,
+                  as: 'author',
+                },
+              ]
+            }
+          ]
+        },
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            Like,
+            Comment,
+          ]
+        }
+      ],
+    });
+    const onePosts = await Promise.all(posts.map(post => this.getOnePostByPost(userId, post)));
+    return onePosts;
   }
 }
