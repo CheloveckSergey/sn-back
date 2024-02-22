@@ -5,6 +5,7 @@ import { CrTypeCodes, CrTypesNames, CreationType } from './creation-types.model'
 import { Op } from 'sequelize';
 import { AuthorService } from 'src/author/author.service';
 import { LikesService } from 'src/likes/likes.service';
+import { Post } from 'src/posts/posts.model';
 
 @Injectable()
 export class CreationsService {

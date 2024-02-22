@@ -2,17 +2,34 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table 
 import { Creation, OneCreation } from "src/creations/creations.model";
 import { OnePostImage, PostImage } from "src/post-images/post-images.model";
 
+export type PostType = 'ownPost' | 'repost';
+
 export interface OnePost {
   id: number,
   description: string | undefined,
   creationId: number,
   creation: OneCreation,
   postImages: OnePostImage[],
+  type: PostType;
+  repostId: number | null,
+  repost: {
+    id: number,
+    description: string | undefined,
+    creationId: number,
+    creation: OneCreation,
+    postImages: OnePostImage[],
+    isReposted: boolean,
+    repostsNumber: number,
+  } | null,
+  isReposted: boolean,
+  repostsNumber: number,
 }
 
 export interface PostCreationAttrs {
-  description: string | undefined,
+  description?: string | undefined,
   creationId: number,
+  type?: PostType;
+  repostId?: number,
 }
 
 @Table({
@@ -33,4 +50,17 @@ export class Post extends Model<Post, PostCreationAttrs> {
 
   @HasMany(() => PostImage)
   postImages: PostImage[];
+
+  @Column({type: DataType.STRING, allowNull: false, defaultValue: 'ownPost'})
+  type: PostType;
+
+  @ForeignKey(() => Post)
+  @Column({type: DataType.NUMBER, allowNull: true})
+  repostId: number;
+
+  @BelongsTo(() => Post, 'repostId')
+  repost: Post;
+
+  @HasMany(() => Post, 'repostId')
+  posts: Post[];
 }

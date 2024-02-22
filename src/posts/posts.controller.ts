@@ -43,6 +43,15 @@ export class PostsController {
     // return {message: 'Иди нахуй'};
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('/createRepost')
+  createRepost(
+    @Body() { repostId, authorId }: { repostId: number, authorId: number },
+  ) {
+    console.log("\n\nCREATE_REPOST_CONTROLLER");
+    return this.postsService.createRepost(repostId, authorId);
+  }
+
   // @UseGuards(JwtAuthGuard)
   // @Post('/createGroupPost')
   // @UseInterceptors(FileInterceptor('img'))

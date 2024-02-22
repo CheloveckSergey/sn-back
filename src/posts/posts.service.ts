@@ -11,6 +11,8 @@ import { Like } from 'src/likes/likes.model';
 import { Comment } from 'src/comments/comments.model';
 import { Author } from 'src/author/author.model';
 import { AuthorType } from 'src/author/author-types.model';
+import { AuthorService } from 'src/author/author.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +21,7 @@ export class PostsService {
     @InjectModel(Post) private postRepository: typeof Post,
     private creationsService: CreationsService,
     private postImagesService: PostImagesService,
+    private usersService: UsersService,
   ) {}
 
   async getAllPostsByAuthors(authorIds: number[]) {
@@ -138,18 +141,121 @@ export class PostsService {
   }
 
   async getOnePostByPost(userId: number, post: Post): Promise<OnePost> {
-    const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
-    const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
-      return this.postImagesService.getOnePostImage(userId, postImage);
-    }));
-    const onePost: OnePost = {
-      id: post.id,
-      description: post.description,
-      creationId: post.creationId,
-      creation: oneCreation,
-      postImages: onePostImages,
+    const user = await this.usersService.getUserById(userId);
+
+    if (post.type === 'ownPost') {
+
+      const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
+      const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
+        return this.postImagesService.getOnePostImage(userId, postImage);
+      }));
+
+      const reposts = await this.postRepository.findAll({
+        where: {
+          type: 'repost',
+          repostId: post.id,
+        }
+      });
+      const repostsNumber: number = reposts.length;
+
+      let isReposted: boolean;
+      const pCreations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, user.authorId)
+      if (!pCreations.length) {
+        isReposted = false;
+      } else {
+        const _post = await this.postRepository.findOne({
+          where: {
+            type: 'repost',
+            repostId: post.id,
+            creationId: {
+              [Op.or]: pCreations.map(creation => creation.id),
+            }
+          }
+        });
+        if (_post) {
+          isReposted = true;
+        } else {
+          isReposted = false;
+        }
+      }
+
+      const onePost: OnePost = {
+        id: post.id,
+        description: post.description,
+        creationId: post.creationId,
+        creation: oneCreation,
+        postImages: onePostImages,
+        type: post.type,
+        repost: null,
+        repostId: null,
+        repostsNumber,
+        isReposted,
+      }
+
+      return onePost;
+    } else {
+      const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
+      const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
+        return this.postImagesService.getOnePostImage(userId, postImage);
+      }));
+
+      const oneRepostCreation = await this.creationsService.getOneCreationByCreation(userId, post.repost.creation);
+      const oneRepostImages: OnePostImage[] = await Promise.all(post.repost.postImages.map(postImage => {
+        return this.postImagesService.getOnePostImage(userId, postImage);
+      }));
+
+      const reposts = await this.postRepository.findAll({
+        where: {
+          type: 'repost',
+          repostId: post.repost.id,
+        }
+      });
+      const repostsNumber: number = reposts.length;
+
+      let isReposted: boolean;
+      const pCreations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, user.authorId)
+      if (!pCreations.length) {
+        isReposted = false;
+      } else {
+        const _post = await this.postRepository.findOne({
+          where: {
+            type: 'repost',
+            repostId: post.repost.id,
+            creationId: {
+              [Op.or]: pCreations.map(creation => creation.id),
+            }
+          }
+        });
+        if (_post) {
+          isReposted = true;
+        } else {
+          isReposted = false;
+        }
+      }
+
+      const onePost: OnePost = {
+        id: post.id,
+        description: post.description,
+        creationId: post.creationId,
+        creation: oneCreation,
+        postImages: onePostImages,
+        type: post.type,
+        repostId: post.repostId,
+        repostsNumber: 0,
+        isReposted: false,
+        repost: {
+          id: post.repost.id,
+          description: post.repost.description,
+          creationId: post.repost.creationId,
+          creation: oneRepostCreation,
+          postImages: oneRepostImages,
+          repostsNumber,
+          isReposted,
+        },
+      }
+
+      return onePost;
     }
-    return onePost;
   }
 
   async getAllOnePostsByAuthorId(userId: number, authorId: number): Promise<OnePost[]> {
@@ -159,13 +265,17 @@ export class PostsService {
   }
 
   async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number) {
-    console.log("CREATE_POST_BY_AUTHOR");
-    console.log("AUTHOR_ID: " + authorId + ' ' + typeof authorId);
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.POST);
     const post = await this.postRepository.create({description, creationId: creation.id});
     for (let imageFile of imageFiles) {
       await this.postImagesService.createImage(imageFile, post.id, authorId);
     }
+    return post;
+  }
+
+  async createRepost(repostId: number, authorId: number) {
+    const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.POST);
+    const post = await this.postRepository.create({creationId: creation.id, type: 'repost', repostId});
     return post;
   }
 
@@ -183,7 +293,6 @@ export class PostsService {
   /////////////////////////////////////////////////////////////////////////
 
   async getFeedByAuthorId(authorId: number, userId: number, query: { offset?: number, limit?: number }) {
-    console.log(query);
     const creations = await this.creationsService.getTCreationsByAuthorId(CrTypeCodes.POST, authorId);
     if (!creations.length) {
       return [];
@@ -270,6 +379,84 @@ export class PostsService {
           include: [
             Like,
             Comment,
+          ]
+        },
+        {
+          model: Post,
+          as: 'repost',
+          include: [
+            {
+              model: Creation,
+              as: 'creation',
+              include: [
+                {
+                  model: Like,
+                  as: 'likes',
+                },
+                {
+                  model: Comment,
+                  as: 'comments',
+                  include: [
+                    {
+                      model: Creation,
+                      as: 'ownCreation',
+                      include: [
+                        {
+                          model: Author,
+                          as: 'author',
+                          include: [
+                            {
+                              model: AuthorType,
+                              as: 'type',
+                            }
+                          ]
+                        },
+                        {
+                          model: Like,
+                          as: 'likes',
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  model: Author,
+                  as: 'author',
+                },
+              ]
+            },
+            {
+              model: PostImage,
+              as: 'postImages',
+              include: [
+                {
+                  model: Creation,
+                  as: 'creation',
+                  include: [
+                    {
+                      model: Like,
+                      as: 'likes',
+                    },
+                    {
+                      model: Comment,
+                      as: 'comments',
+                    },
+                    {
+                      model: Author,
+                      as: 'author',
+                    },
+                  ]
+                }
+              ]
+            },
+            {
+              model: Creation,
+              as: 'creation',
+              include: [
+                Like,
+                Comment,
+              ]
+            }
           ]
         }
       ],

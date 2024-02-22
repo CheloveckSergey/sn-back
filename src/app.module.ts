@@ -45,6 +45,7 @@ import { MReadHistoryModule } from './m-read-history/m-read-history.module';
 import { MReadHistory } from "./m-read-history/m-read-history.model";
 import { FriendRequest } from "./friends/friend-requests.model";
 import { FriendsModule } from './friends/friends.module';
+import { RepostsModule } from './reposts/reposts.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { FriendsModule } from './friends/friends.module';
     ServiceModule,
     MReadHistoryModule,
     FriendsModule,
+    RepostsModule,
   ]
 })
 export class AppModule {}
