@@ -3,6 +3,7 @@ import { AuthorType } from "./author-types.model";
 import { User } from "src/users/users.model";
 import { Author_Subs } from "./author-subs.model";
 import { Creation } from "src/creations/creations.model";
+import { AddedMusicList } from "src/added-music-lists/added-music-lists.model";
 
 export interface AuthorWithSubscribed {
   id: number,
@@ -52,4 +53,7 @@ export class Author extends Model<Author, AuthorCreationAttrs> {
 
   @HasMany(() => Creation)
   creations: Creation[];
+
+  @HasOne(() => AddedMusicList, 'authorId')
+  addedMusicList: AddedMusicList;
 }

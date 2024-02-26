@@ -14,6 +14,7 @@ async function start() {
   }));
   app.use(cookieParser());
   app.use(express.static(path.resolve('src', 'static')));
+  app.use(express.static(path.resolve('src', 'static', 'music')));
   await app.listen(PORT, () => console.log("СЕРВЕР СТАРТОВАЛ НА ПОРТУ " + PORT));
 }
 

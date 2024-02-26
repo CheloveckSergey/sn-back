@@ -46,6 +46,16 @@ import { MReadHistory } from "./m-read-history/m-read-history.model";
 import { FriendRequest } from "./friends/friend-requests.model";
 import { FriendsModule } from './friends/friends.module';
 import { RepostsModule } from './reposts/reposts.module';
+import { MusicsModule } from './musics/musics.module';
+import { MusicAlbumsModule } from './music-albums/music-albums.module';
+import { MusiciansModule } from './musicians/musicians.module';
+import { PlaylistsModule } from './playlists/playlists.module';
+import { AddedMusicListsModule } from './added-music-lists/added-music-lists.module';
+import { AddedMusicList } from "./added-music-lists/added-music-lists.model";
+import { AMLMusic } from "./added-music-lists/aml-musics.model";
+import { MusicAlbum } from "./music-albums/music-albums.model";
+import { Musician } from "./musicians/musicians.model";
+import { Music } from "./musics/musics.model";
 
 @Module({
   imports: [
@@ -83,6 +93,11 @@ import { RepostsModule } from './reposts/reposts.module';
         RoomMember,
         MReadHistory,
         FriendRequest,
+        AddedMusicList,
+        AMLMusic,
+        MusicAlbum,
+        Musician,
+        Music,
       ],
       autoLoadModels: true,
     }),
@@ -106,6 +121,11 @@ import { RepostsModule } from './reposts/reposts.module';
     MReadHistoryModule,
     FriendsModule,
     RepostsModule,
-  ]
+    MusicsModule,
+    MusicAlbumsModule,
+    MusiciansModule,
+    PlaylistsModule,
+    AddedMusicListsModule,
+  ],
 })
 export class AppModule {}
