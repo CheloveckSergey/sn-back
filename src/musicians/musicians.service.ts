@@ -11,6 +11,11 @@ export class MusiciansService {
     private imageService: ImageService,
   ) {}
 
+  async getById(id: number) {
+    const musician = await this.musicianRep.findByPk(id);
+    return musician;
+  }
+
   async getByName(name: string) {
     const musician = await this.musicianRep.findOne({
       where: {
@@ -36,4 +41,19 @@ export class MusiciansService {
     myImage?.save();
     return musician;
   } 
+
+  async updateAvatar(musicianId: number, imageFile: Express.Multer.File) {
+    if (!imageFile) {
+      throw new HttpException("Нет изображения", HttpStatus.BAD_REQUEST);
+    }
+    const myImage: MyImage = new MyImage(imageFile);
+    const _musician = await this.musicianRep.update({image: myImage.name}, {
+      where: {
+        id: musicianId,
+      }
+    });
+    myImage.save();
+    const musician = await this.getById(musicianId);
+    return musician;
+  }
 }

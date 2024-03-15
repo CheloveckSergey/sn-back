@@ -11,6 +11,9 @@ import { AMLMusic } from './aml-musics.model';
   providers: [AddedMusicListsService],
   imports: [
     SequelizeModule.forFeature([AddedMusicList, AMLMusic]),
+  ],
+  exports: [
+    AddedMusicListsService,
   ]
 })
 export class AddedMusicListsModule {}

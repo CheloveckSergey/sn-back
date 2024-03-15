@@ -4,6 +4,19 @@ import { AMLMusic } from "src/added-music-lists/aml-musics.model";
 import { MusicAlbum } from "src/music-albums/music-albums.model";
 import { Musician } from "src/musicians/musicians.model";
 
+export type OneMusic = {
+  id: number,
+  name: string,
+  value: string;
+  image: string | null;
+  musicianId: number;
+  musician: Musician;
+  albumId: number | null;
+  album?: MusicAlbum;
+  
+  added: boolean,
+}
+
 interface MusicCreationAttrs {
   name: string,
   value: string,

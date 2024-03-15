@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import * as uuid from 'uuid';
 import * as path from 'path';
 import { writeFile } from 'fs/promises';
+import { unlink } from "fs";
 
 export class MyMusic {
   file: Express.Multer.File;
@@ -15,6 +16,16 @@ export class MyMusic {
   async save() {
     await writeFile(path.resolve('src', 'static', 'music', this.name), this.file.buffer);
   }
+
+  static async delete(name: string) {
+    unlink(path.resolve('src', 'static', 'music', name), (error) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      console.log('Не удалено');
+    });
+  } 
 }
 
 @Injectable()
