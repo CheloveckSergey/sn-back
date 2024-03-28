@@ -13,6 +13,9 @@ import { Author } from 'src/author/author.model';
 import { AuthorType } from 'src/author/author-types.model';
 import { AuthorService } from 'src/author/author.service';
 import { UsersService } from 'src/users/users.service';
+import { Music, OneMusic } from 'src/musics/musics.model';
+import { MusicsService } from 'src/musics/musics.service';
+import { Musician } from 'src/musicians/musicians.model';
 
 @Injectable()
 export class PostsService {
@@ -22,6 +25,7 @@ export class PostsService {
     private creationsService: CreationsService,
     private postImagesService: PostImagesService,
     private usersService: UsersService,
+    private musicsService: MusicsService,
   ) {}
 
   async getAllPostsByAuthors(authorIds: number[]) {
@@ -134,7 +138,17 @@ export class PostsService {
             Like,
             Comment,
           ]
-        }
+        },
+        {
+          model: Music,
+          as: 'musics',
+          include: [
+            {
+              model: Musician,
+              as: 'musician',
+            }
+          ]
+        },
       ],
     });
     return posts;
@@ -148,6 +162,9 @@ export class PostsService {
       const oneCreation = await this.creationsService.getOneCreationByCreation(userId, post.creation);
       const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
         return this.postImagesService.getOnePostImage(userId, postImage);
+      }));
+      const oneMusics: OneMusic[] = await Promise.all(post.musics.map(music => {
+        return this.musicsService.getOneMusicByMusic(music, user.authorId);
       }));
 
       const reposts = await this.postRepository.findAll({
@@ -185,6 +202,7 @@ export class PostsService {
         creationId: post.creationId,
         creation: oneCreation,
         postImages: onePostImages,
+        musics: oneMusics,
         type: post.type,
         repost: null,
         repostId: null,
@@ -198,6 +216,9 @@ export class PostsService {
       const onePostImages: OnePostImage[] = await Promise.all(post.postImages.map(postImage => {
         return this.postImagesService.getOnePostImage(userId, postImage);
       }));
+      const oneMusics: OneMusic[] = await Promise.all(post.musics.map(music => {
+        return this.musicsService.getOneMusicByMusic(music, user.authorId);
+      })) 
 
       const oneRepostCreation = await this.creationsService.getOneCreationByCreation(userId, post.repost.creation);
       const oneRepostImages: OnePostImage[] = await Promise.all(post.repost.postImages.map(postImage => {
@@ -239,6 +260,7 @@ export class PostsService {
         creationId: post.creationId,
         creation: oneCreation,
         postImages: onePostImages,
+        musics: [],
         type: post.type,
         repostId: post.repostId,
         repostsNumber: 0,
@@ -249,8 +271,10 @@ export class PostsService {
           creationId: post.repost.creationId,
           creation: oneRepostCreation,
           postImages: oneRepostImages,
+          musics: oneMusics,
           repostsNumber,
           isReposted,
+          type: 'ownPost',
         },
       }
 
@@ -264,12 +288,19 @@ export class PostsService {
     return allOnePosts;
   }
 
-  async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number) {
+  async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number, musicsIds: number[] | null) {
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.POST);
     const post = await this.postRepository.create({description, creationId: creation.id});
     for (let imageFile of imageFiles) {
       await this.postImagesService.createImage(imageFile, post.id, authorId);
     }
+    if (musicsIds) {
+      const musics = await Promise.all(musicsIds.map(musicId => this.musicsService.getById(musicId)));
+      for (let music of musics) {
+        post.$add('musics', music.id);
+      }
+    }
+    
     return post;
   }
 
@@ -382,6 +413,16 @@ export class PostsService {
           ]
         },
         {
+          model: Music,
+          as: 'musics',
+          include: [
+            {
+              model: Musician,
+              as: 'musician',
+            }
+          ]
+        },
+        {
           model: Post,
           as: 'repost',
           include: [
@@ -446,6 +487,16 @@ export class PostsService {
                       as: 'author',
                     },
                   ]
+                }
+              ]
+            },
+            {
+              model: Music,
+              as: 'musics',
+              include: [
+                {
+                  model: Musician,
+                  as: 'musician',
                 }
               ]
             },

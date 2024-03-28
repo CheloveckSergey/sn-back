@@ -3,6 +3,8 @@ import { AddedMusicList } from "src/added-music-lists/added-music-lists.model";
 import { AMLMusic } from "src/added-music-lists/aml-musics.model";
 import { MusicAlbum } from "src/music-albums/music-albums.model";
 import { Musician } from "src/musicians/musicians.model";
+import { MusicPost } from "./music-post.model";
+import { Post } from "src/posts/posts.model";
 
 export type OneMusic = {
   id: number,
@@ -57,4 +59,7 @@ export class Music extends Model<Music, MusicCreationAttrs> {
 
   @BelongsToMany(() => AddedMusicList, () => AMLMusic)
   addedMusicLists: AddedMusicList[];
+
+  @BelongsToMany(() => Post, () => MusicPost)
+  posts: Post[];
 }

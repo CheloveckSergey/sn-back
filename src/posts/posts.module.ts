@@ -7,6 +7,7 @@ import { PostImagesModule } from 'src/post-images/post-images.module';
 import { PostsService } from './posts.service';
 import { AuthorModule } from 'src/author/author.module';
 import { UsersModule } from 'src/users/users.module';
+import { MusicsModule } from 'src/musics/musics.module';
 
 @Module({
   providers: [PostsService],
@@ -17,6 +18,7 @@ import { UsersModule } from 'src/users/users.module';
     PostImagesModule,
     AuthorModule,
     UsersModule,
+    MusicsModule,
   ],
 })
 export class PostModule {}

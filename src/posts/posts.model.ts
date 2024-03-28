@@ -1,5 +1,7 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { Creation, OneCreation } from "src/creations/creations.model";
+import { MusicPost } from "src/musics/music-post.model";
+import { Music, OneMusic } from "src/musics/musics.model";
 import { OnePostImage, PostImage } from "src/post-images/post-images.model";
 
 export type PostType = 'ownPost' | 'repost';
@@ -10,6 +12,7 @@ export interface OnePost {
   creationId: number,
   creation: OneCreation,
   postImages: OnePostImage[],
+  musics: OneMusic[],
   type: PostType;
   repostId: number | null,
   repost: {
@@ -18,8 +21,10 @@ export interface OnePost {
     creationId: number,
     creation: OneCreation,
     postImages: OnePostImage[],
+    musics: OneMusic[],
     isReposted: boolean,
     repostsNumber: number,
+    type: PostType;
   } | null,
   isReposted: boolean,
   repostsNumber: number,
@@ -63,4 +68,7 @@ export class Post extends Model<Post, PostCreationAttrs> {
 
   @HasMany(() => Post, 'repostId')
   posts: Post[];
+
+  @BelongsToMany(() => Music, () => MusicPost)
+  musics: Music[];
 }

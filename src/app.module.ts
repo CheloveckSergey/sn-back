@@ -56,6 +56,7 @@ import { AMLMusic } from "./added-music-lists/aml-musics.model";
 import { MusicAlbum } from "./music-albums/music-albums.model";
 import { Musician } from "./musicians/musicians.model";
 import { Music } from "./musics/musics.model";
+import { MusicPost } from "./musics/music-post.model";
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { Music } from "./musics/musics.model";
         MusicAlbum,
         Musician,
         Music,
+        MusicPost,
       ],
       autoLoadModels: true,
     }),
