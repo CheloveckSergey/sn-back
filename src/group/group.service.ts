@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Group, GroupWithSubscribed } from './group.model';
+import { Group, OneGroup } from './group.model';
 import { UsersService } from 'src/users/users.service';
 import { GroupDesc } from './group-desc.model';
 import * as uuid from 'uuid';
@@ -9,18 +9,9 @@ import { writeFile } from 'fs/promises';
 import { AuthorService, _Author } from 'src/author/author.service';
 import { AuthorType, AuthorTypeCodes } from 'src/author/author-types.model';
 import { GMTypes, GroupMember } from './group-members.model';
-import { Author } from 'src/author/author.model';
+import { Author, OneAuthor } from 'src/author/author.model';
 import { User } from 'src/users/users.model';
-
-//Возвращает автора, с информацией, подписан ли на него текущий пользователь,
-//и массивом подписчиков, в котором есть текущий юзер, либо нет
-// interface AuthorWithSubscribed extends Author {
-//   subscribed: boolean;
-// }
-
-// interface GroupWithSubscribed extends Group {
-//   author: AuthorWithSubscribed;
-// }
+import { MyImage } from 'src/service/image.service';
 
 @Injectable()
 export class GroupService {
@@ -32,97 +23,111 @@ export class GroupService {
     private authorService: AuthorService,
   ) {}
 
-  async getAllGroups() {
-    const allGroups = await this.groupRepository.findAll();
-    return allGroups;
-  }
-
-  // Это какой то пиздец, но, если данный юзер не подписан на автора,
-  // то автор просто не хочет подгружаться. Из-за этого приходится
-  // отдельно искать подписчика в авторе, делая дополнительный запрос.
-  async getGroupById(id: number) {
+  async getGroupById(id: number, userId: number): Promise<OneGroup> {
     const group = await this.groupRepository.findOne({
       where: {
         id
       },
       include: [
         {
+          model: GroupMember,
+          as: 'groupMembers',
+        },
+        {
           model: Author,
           as: 'author',
-          include: [
-            {
-              model: AuthorType,
-              as: 'type',
-            },
-            // {
-            //   model: User,
-            //   as: 'subscribers',
-            //   // where: {
-            //   //   id: userId,
-            //   // }
-            // }
-          ]
         }
       ]
     });
-    return group;
+    const oneGroup: OneGroup = await this.getOneGroupByGroup(group, userId);
+    return oneGroup;
   }
 
-  async getGroupByName(name: string) {
+  async getGroupByName(name: string, userId: number): Promise<OneGroup> {
     const group = await this.groupRepository.findOne({
+      where: {
+        name,
+      },
+      include: [
+        {
+          model: GroupMember,
+          as: 'groupMembers',
+        },
+        {
+          model: Author,
+          as: 'author',
+        }
+      ]
+    });
+    const oneGroup: OneGroup = await this.getOneGroupByGroup(group, userId);
+    return oneGroup;
+  }
+  
+  async getAllGroups(userId: number): Promise<OneGroup[]> {
+    const allGroups = await this.groupRepository.findAll({
+      include: [
+        {
+          model: GroupMember,
+          as: 'groupMembers',
+        },
+        {
+          model: Author,
+          as: 'author',
+        }
+      ]
+    });
+    const allOneGroups: OneGroup[] = await Promise.all(
+      allGroups.map(group => this.getOneGroupByGroup(group, userId))
+    )
+    return allOneGroups;
+  }
+
+  async getOneGroupByGroup(group: Group, userId: number): Promise<OneGroup> {
+    if (!group.groupMembers) {
+      throw new HttpException('Нет groupMembers', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    const oneAuthor: OneAuthor = await this.authorService.getOneAuthorByAuthor(userId, group.author);
+    const oneGroup: OneGroup = {
+      id: group.id,
+      name: group.name,
+      avatar: group.avatar,
+      membersNumber: group.groupMembers.length,
+      authorId: group.authorId,
+      author: oneAuthor,
+    }
+    return oneGroup;
+  }
+
+  async createGroup(userId: number, name: string, avatarFile: Express.Multer.File | undefined) {
+    const candidate = await this.groupRepository.findOne({
       where: {
         name,
       }
     });
-    return group;
-  }
-
-  async getGroupWSFromGroup(group: Group, userId: number) {
-    const isSubscribed = await this.authorService.isSubscribed(userId, group.author.id);
-    const groupWithSubscribed: GroupWithSubscribed = {
-      id: group.id,
-      name: group.name,
-      avatar: group.avatar,
-      author: {
-        id: group.author.id,
-        name: group.author.name,
-        avatar: group.author.avatar,
-        type: group.author.type,
-        subscribed: isSubscribed ? true : false,
-      }
-    }
-    return groupWithSubscribed;
-  }
-
-  async getGroupWS(groupId: number, userId: number) {
-    const group = await this.getGroupById(groupId);
-    const groupWithSubscribed = this.getGroupWSFromGroup(group, userId)
-    return groupWithSubscribed;
-  }
-
-  async createGroup(userId: number, name: string, avatarFile: Express.Multer.File) {
-    const candidate = await this.getGroupByName(name);
     if (candidate) {
       throw new HttpException('Группа с таким именем уже существует', HttpStatus.BAD_REQUEST);
     }
 
-    let imageName: string | null;
+    let myImage: MyImage | undefined; 
     if (avatarFile) {
-      imageName = uuid.v4() + '.jpg';
-      await writeFile(path.resolve('src', 'static', imageName), avatarFile.buffer);
-    } else {
-      imageName = null;
+      myImage = new MyImage(avatarFile)
     }
-    const author = await this.authorService.createAuthor(name, AuthorTypeCodes.GROUP, imageName);
-    const group = await this.groupRepository.create({name, avatar: imageName, authorId: author.id});
-    const group_members = await this.groupMembersRep.create({
+
+    const author = await this.authorService.createAuthor(name, AuthorTypeCodes.GROUP, myImage?.name);
+    const group = await this.groupRepository.create({name, avatar: myImage?.name, authorId: author.id});
+    const group_member = await this.groupMembersRep.create({
       groupId: group.id, userId: userId, gmType: GMTypes.ADMIN,
     });
+    myImage?.save();
     return {message: 'Группа создана'};
   }
 
   async deleteGroup(groupId: number) {
-    const group = await this.getGroupById(groupId);
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      }
+    });
     if (!group) {
       throw new HttpException('Такой группы не существует ебать', HttpStatus.BAD_REQUEST);
     }
@@ -147,7 +152,11 @@ export class GroupService {
         }
       }
     );
-    const group = await this.getGroupByName(name);
+    const group = await this.groupRepository.findOne({
+      where: {
+        name,
+      }
+    });
     await this.authorService.updateAvatar(avatarName, group.author.id);
     return {message: 'Ну вроде нормал'};
   }

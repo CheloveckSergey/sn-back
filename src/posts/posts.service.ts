@@ -28,6 +28,100 @@ export class PostsService {
     private musicsService: MusicsService,
   ) {}
 
+  async getPostById(id: number, userId: number): Promise<OnePost> {
+    const post = await this.postRepository.findOne({
+      where: {
+        id,
+      },
+      include: [
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            {
+              model: Like,
+              as: 'likes',
+            },
+            {
+              model: Comment,
+              as: 'comments',
+              include: [
+                {
+                  model: Creation,
+                  as: 'ownCreation',
+                  include: [
+                    {
+                      model: Author,
+                      as: 'author',
+                      include: [
+                        {
+                          model: AuthorType,
+                          as: 'type',
+                        }
+                      ]
+                    },
+                    {
+                      model: Like,
+                      as: 'likes',
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              model: Author,
+              as: 'author',
+            },
+          ]
+        },
+        {
+          model: PostImage,
+          as: 'postImages',
+          include: [
+            {
+              model: Creation,
+              as: 'creation',
+              include: [
+                {
+                  model: Like,
+                  as: 'likes',
+                },
+                {
+                  model: Comment,
+                  as: 'comments',
+                },
+                {
+                  model: Author,
+                  as: 'author',
+                },
+              ]
+            }
+          ]
+        },
+        {
+          model: Creation,
+          as: 'creation',
+          include: [
+            Like,
+            Comment,
+          ]
+        },
+        {
+          model: Music,
+          as: 'musics',
+          include: [
+            {
+              model: Musician,
+              as: 'musician',
+            }
+          ]
+        },
+      ]
+    });
+    const onePost: OnePost = await this.getOnePostByPost(userId, post);
+    return onePost;
+  }
+
   async getAllPostsByAuthors(authorIds: number[]) {
     const postCreations = await this.creationsService.getTCreationsByAuthorIds(CrTypeCodes.POST, authorIds);
     const posts = await this.postRepository.findAll({
@@ -288,7 +382,7 @@ export class PostsService {
     return allOnePosts;
   }
 
-  async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number, musicsIds: number[] | null) {
+  async createPostByAuthor(description: string, imageFiles: Express.Multer.File[], authorId: number, musicsIds: number[] | null, userId: number) {
     const creation = await this.creationsService.createCreation(authorId, CrTypeCodes.POST);
     const post = await this.postRepository.create({description, creationId: creation.id});
     for (let imageFile of imageFiles) {
@@ -300,8 +394,8 @@ export class PostsService {
         post.$add('musics', music.id);
       }
     }
-    
-    return post;
+    const onePost: OnePost = await this.getPostById(post.id, userId)
+    return onePost;
   }
 
   async createRepost(repostId: number, authorId: number) {

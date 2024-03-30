@@ -38,7 +38,22 @@ export class AuthorService {
     return author;
   }
 
-  async getOneAuthorByAuthor(userId: number, author: Author): Promise<OneAuthor> {
+  async getOneAuthorByAuthor(userId: number, _author: Author): Promise<OneAuthor> {
+    const author = await this.authorRep.findOne({
+      where: {
+        id: _author.id,
+      }, 
+      include: [
+        {
+          model: AuthorType,
+          as: 'type',
+        },
+        {
+          model: User,
+          as: 'subscribers',
+        },
+      ]
+    })
     const isSubscribed = await this.isSubscribed(userId, author.id);
     const oneAuthor: OneAuthor = {
       id: author.id,
@@ -46,6 +61,7 @@ export class AuthorService {
       avatar: author.avatar,
       type: author.type,
       subscribed: isSubscribed,
+      subsNumber: author.subscribers.length,
     }
     return oneAuthor;
   }

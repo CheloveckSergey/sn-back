@@ -10,19 +10,15 @@ export class GroupController {
 
   constructor(private groupService: GroupService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getAllGroups')
-  async getAllGroups() {
-    return this.groupService.getAllGroups();
+  async getAllGroups(
+    @Req() req: {
+      userPayload: Payload,
+    }
+  ) {
+    return this.groupService.getAllGroups(req.userPayload.id);
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Get('/getGroupByName/:name')
-  // async getGroupByName(
-  //   @Param('name') name: string,
-  //   @Req() req
-  // ) {
-  //   return this.groupService.getGroupByName(name, req.userPayload.id);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @Get('/getGroupById/:id')
@@ -32,15 +28,8 @@ export class GroupController {
       userPayload: Payload,
     }
   ) {
-    return this.groupService.getGroupWS(id, req.userPayload.id);
+    return this.groupService.getGroupById(id, req.userPayload.id);
   }
-
-  // @Get('/getAdminGroupsByUserId/:id')
-  // async getAdminGroupsByUserId(
-  //   @Param('id') id: number
-  // ) {
-  //   return this.groupService.getAdminGroupsByUserId(id);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/createGroup')
@@ -59,45 +48,6 @@ export class GroupController {
   ) {
     return this.groupService.deleteGroup(dto.groupId);
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Post('/deleteGroupById')
-  // async deleteGroupById(
-  //   @Body() dto: DeleteGrouDto,
-  //   @Req() req
-  // ) {
-  //   return this.groupService.deleteGroupById(dto.groupId, req.user.id);
-  // }
-
-  // @Get('/getSubsByGroupId/:groupId')
-  // async getSubsByGroupId(
-  //   @Param('groupId') groupId: number
-  // ) {
-  //   return this.groupService.getSubsByGroupId(groupId);
-  // }
-
-  // @Get('/getAllSubsByGroupId/:id')
-  // async getAllSubsByGroupId(
-  //   @Param('id') id: number
-  // ) {
-  //   return this.groupService.getAllSubsByGroupId(id);
-  // }
-
-  // @Post('/subscribe/:id')
-  // async subscribe(
-  //   @Param('id') id: number,
-  //   @Req() req
-  // ) {
-  //   return this.groupService.subscribe(req.user.id, id);
-  // }
-
-  // @Post('/unsubscribe/:id')
-  // async unsubscribe(
-  //   @Param('id') id: number,
-  //   @Req() req
-  // ) {
-  //   return this.groupService.subscribe(req.user.id, id);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/createAvatar')

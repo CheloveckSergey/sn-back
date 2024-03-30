@@ -1,14 +1,22 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { GroupMember } from "./group-members.model";
-// import { GroupDesc } from "./group-desc.model";
-import { Author, AuthorWithSubscribed } from "src/author/author.model";
+import { Author, AuthorWithSubscribed, OneAuthor } from "src/author/author.model";
 
-export interface GroupWithSubscribed {
+// export interface GroupWithSubscribed {
+//   id: number,
+//   name: string,
+//   avatar: string | undefined,
+//   author: AuthorWithSubscribed,
+// } 
+
+export interface OneGroup {
   id: number,
   name: string,
-  avatar: string | undefined,
-  author: AuthorWithSubscribed,
-} 
+  avatar: string | null,
+  membersNumber: number,
+  authorId: number,
+  author: OneAuthor,
+}
 
 interface GroupCreationAttrs {
   name: string,
@@ -31,9 +39,6 @@ export class Group extends Model<Group, GroupCreationAttrs> {
 
   @HasMany(() => GroupMember)
   groupMembers: GroupMember[];
-
-  // @HasOne(() => GroupDesc)
-  // description: GroupDesc;
 
   @ForeignKey(() => Author)
   @Column({type: DataType.INTEGER, unique: true, allowNull: false})

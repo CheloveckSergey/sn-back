@@ -33,12 +33,12 @@ export class PostsController {
   @UseInterceptors(FilesInterceptor('img'))
   createPost(
     @Body() dto: { description: string, authorId: number, musicIds: number[] },
-    @Req() req,
+    @Req() req: {userPayload: Payload},
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     console.log('\n\n\n\n');
     console.log(dto);
-    return this.postsService.createPostByAuthor(dto.description, files, Number(dto.authorId), dto.musicIds);
+    return this.postsService.createPostByAuthor(dto.description, files, Number(dto.authorId), dto.musicIds, req.userPayload.id);
     // return {message: 'Иди нахуй'};
   }
 

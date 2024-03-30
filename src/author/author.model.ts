@@ -19,6 +19,7 @@ export interface OneAuthor {
   avatar: string | undefined,
   type: AuthorType,
   subscribed: boolean,
+  subsNumber: number,
 }
 
 interface AuthorCreationAttrs {

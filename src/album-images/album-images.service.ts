@@ -13,6 +13,7 @@ import { Album } from 'src/albums/albums.model';
 import { Author } from 'src/author/author.model';
 import { Comment } from 'src/comments/comments.model';
 import { Like } from 'src/likes/likes.model';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class AlbumImagesService {
@@ -86,6 +87,12 @@ export class AlbumImagesService {
             {
               model: Author,
               as: 'author',
+              include: [
+                {
+                  model: User,
+                  as: 'subscribers',
+                }
+              ]
             },
             {
               model: Comment,
